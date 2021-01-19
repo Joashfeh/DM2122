@@ -11,6 +11,7 @@ Matrix 4 by 4 use for affine transformation
 #define MTX_44_H
 
 #include "MyMath.h"
+#include "Vector3.h"
 
 #pragma warning( disable: 4290 ) //for throw(DivideByZero)
 
@@ -35,10 +36,12 @@ public:
 	Mtx44 operator+(const Mtx44& rhs) const;
 	Mtx44& operator=(const Mtx44& rhs);
 	Mtx44 operator*(float scalar) const;
+	Vector3 operator*(const Vector3& rhs) const;
 	void SetToRotation(float degrees, float axisX, float axisY, float axisZ) throw( DivideByZero );
 	void SetToScale(float sx, float sy, float sz);
 	void SetToTranslation(float tx, float ty, float tz);
 	void SetToFrustum(double left, double right, double	bottom, double top, double near, double far);
+	void SetToShear(char axis, float sx, float sy, float sz);
 	void SetToLookAt(double eyeX, double eyeY, double eyeZ,
 				double centerX, double centerY, double centerZ,
 				double upX, double upY, double upZ);

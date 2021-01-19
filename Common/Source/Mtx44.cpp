@@ -8,7 +8,6 @@ Matrix 4 by 4 use for affine transformation
 */
 /******************************************************************************/
 #include "Mtx44.h"
-#include "Vector3.h"
 /******************************************************************************/
 /*!
 \brief
@@ -284,6 +283,25 @@ Mtx44 Mtx44::operator*(float scalar) const {
 /******************************************************************************/
 /*!
 \brief
+operator* overload for matrix-vector3 multiplication
+
+\param rhs
+	Vector3 to multiply with
+\return 
+	Resulting vector
+*/
+/******************************************************************************/
+Vector3 Mtx44::operator*(const Vector3& rhs) const {
+	float b[4];
+	for(int i = 0; i < 4; i++)
+		b[i] = a[0 * 4 + i] * rhs.x + a[1 * 4 + i] * rhs.y + a[2 * 4 + i] * rhs.z + a[3 * 4 + i] * 0;
+	Vector3 ret(b[0], b[1], b[2]);
+	return ret;
+}
+
+/******************************************************************************/
+/*!
+\brief
 Set Matrix to a rotation matrix about arbitrary axis
 
 \param	degrees
@@ -386,6 +404,29 @@ void Mtx44::SetToFrustum(double left, double right, double bottom, double top, d
 		0, (float)(2 * near / (top - bottom)), 0, 0,
 		(float)((right + left) / (right - left)), (float)((top + bottom) / (top - bottom)), - (float)((far + near) / (far - near)), -1,
 		0, 0, - (float)(2 * far * near / (far - near)), 0);
+}
+
+void Mtx44::SetToShear(char axis, float sx, float sy, float sz)
+{
+	SetToIdentity();
+	switch (axis)
+	{
+	case 'x':
+		a[1] = sy;
+		a[2] = sz;
+		break;
+	case 'y':
+		a[4] = sx;
+		a[6] = sz;
+		break;
+	case 'z':
+		a[8] = sx;
+		a[9] = sy;
+		break;
+	default:
+		break;
+	}
+
 }
 
 /******************************************************************************/

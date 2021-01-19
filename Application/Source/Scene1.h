@@ -3,6 +3,12 @@
 
 #include "Scene.h"
 
+enum GEOMETRY_TYPE {
+	GEO_TRIANGLE_1 = 0,
+	GEO_TRIANGLE_2 = 1,
+	NUM_GEOMETRY,
+};
+
 class Scene1 : public Scene
 {
 public:
@@ -13,6 +19,12 @@ public:
 	virtual void Update(double dt);
 	virtual void Render();
 	virtual void Exit();
+
+private:
+	unsigned m_vertexArrayID;
+	unsigned m_vertexBuffer[NUM_GEOMETRY];
+	unsigned m_colorBuffer[NUM_GEOMETRY];
+	unsigned m_programID;
 };
 
 #endif

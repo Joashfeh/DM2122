@@ -1,4 +1,4 @@
-
+#include <iostream>
 #include "Application.h"
 
 //Include GLEW
@@ -10,12 +10,19 @@
 //Include the standard C++ headers
 #include <stdio.h>
 #include <stdlib.h>
-
-#include "Scene1.h"
+#include "Camera3.h"
+#include "Assignment2.h"
 
 GLFWwindow* m_window;
 const unsigned char FPS = 60; // FPS of this game
 const unsigned int frameTime = 1000 / FPS; // time for each frame
+
+double Application::mouse_last_x = 0.0, Application::mouse_last_y = 0.0,
+	Application::mouse_current_x = 0.0, Application::mouse_current_y = 0.0,
+	Application::mouse_diff_x = 0.0, Application::mouse_diff_y = 0.0;
+double Application::camera_yaw = 0.0, Application::camera_pitch = 0.0;
+
+bool firstMouse = true;
 
 //Define an error callback
 static void error_callback(int error, const char* description)
@@ -36,12 +43,52 @@ bool Application::IsKeyPressed(unsigned short key)
     return ((GetAsyncKeyState(key) & 0x8001) != 0);
 }
 
+bool Application::IsKeyReleased(unsigned short key)
+{
+	return ((GetAsyncKeyState(key) & 0x8001) == 0);
+}
+
 Application::Application()
 {
 }
 
 Application::~Application()
 {
+}
+
+void resize_callback(GLFWwindow* window, int w, int h) {
+	glViewport(0, 0, w, h); // update opengl the new window size	
+}
+
+bool Application::GetMouseUpdate()
+{
+	glfwGetCursorPos(m_window, &mouse_current_x, &mouse_current_y);
+
+	// Calculate the difference in positions
+	mouse_diff_x = mouse_current_x - mouse_last_x;
+	mouse_diff_y = mouse_current_y - mouse_last_y;
+
+	//Calculate the yaw and pitch
+	camera_yaw = (float)mouse_diff_x * 0.0174555555555556f;// * 3.142f / 180.0f;
+	camera_pitch = mouse_diff_y * 0.0174555555555556f;// 3.142f / 180.0f );
+
+	// Do a wraparound if the mouse cursor has gone out of the deadzone
+	if ((mouse_current_x < m_window_deadzone) || (mouse_current_x > m_window_width - m_window_deadzone))
+	{
+		mouse_current_x = m_window_width >> 1;
+		glfwSetCursorPos(m_window, mouse_current_x, mouse_current_y);
+	}
+	if ((mouse_current_y < m_window_deadzone) || (mouse_current_y > m_window_height - m_window_deadzone))
+	{
+		mouse_current_y = m_window_height >> 1;
+		glfwSetCursorPos(m_window, mouse_current_x, mouse_current_y);
+	}
+
+	// Store the current position as the last position
+	mouse_last_x = mouse_current_x;
+	mouse_last_y = mouse_current_y;
+
+	return false;
 }
 
 void Application::Init()
@@ -65,6 +112,8 @@ void Application::Init()
 
 	//Create a window and create its OpenGL context
 	m_window = glfwCreateWindow(800, 600, "Test Window", NULL, NULL);
+	glfwSetWindowSizeCallback(m_window, resize_callback);
+	glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 	//If the window couldn't be created
 	if (!m_window)
@@ -95,12 +144,13 @@ void Application::Init()
 void Application::Run()
 {
 	//Main Loop
-	Scene *scene = new Scene1();
+	Scene *scene = new Assignment2();
 	scene->Init();
 
 	m_timer.startTimer();    // Start timer to calculate how long it takes to render this frame
 	while (!glfwWindowShouldClose(m_window) && !IsKeyPressed(VK_ESCAPE))
 	{
+		GetMouseUpdate();
 		scene->Update(m_timer.getElapsedTime());
 		scene->Render();
 		//Swap buffers
@@ -121,3 +171,4 @@ void Application::Exit()
 	//Finalize and clean up GLFW
 	glfwTerminate();
 }
+

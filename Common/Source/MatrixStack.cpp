@@ -172,6 +172,12 @@ void MS::Translate(float translateX, float translateY, float translateZ) {
 	ms.top() = ms.top() * mat;
 }
 
+void MS::Shear(char axis, float sx, float sy, float sz) {
+	Mtx44 mat;
+	mat.SetToShear(axis, sx, sy, sz);
+	ms.top() = ms.top() * mat;
+}
+
 /******************************************************************************/
 /*!
 \brief

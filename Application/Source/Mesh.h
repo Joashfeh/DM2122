@@ -31,6 +31,7 @@ public:
 	Mesh(const std::string &meshName);
 	~Mesh();
 	void Render();
+	void Render(unsigned offset, unsigned count);
 
 	const std::string name;
 	Material material;

@@ -587,7 +587,7 @@ Mesh* MeshBuilder::GenerateTorus(const std::string& meshName, Color color, unsig
 {
     Vertex v;
     std::vector<Vertex> vertex_buffer_data;
-    std::vector<unsigned> index_buffer_data;
+    std::vector<GLuint> index_buffer_data;
     float degreePerStack = Math::DegreeToRadian(360.f / numstack);
     float degreePerSlice = Math::DegreeToRadian(360.f / numslice);
 
@@ -648,4 +648,44 @@ Mesh* MeshBuilder::GenerateOBJ(const std::string& meshName, const std::string& f
 	mesh->mode = Mesh::DRAW_MODE::DRAW_TRIANGLES;
 	mesh->indexSize = index_buffer_data.size();
 	return mesh;
+}
+
+Mesh* MeshBuilder::GenerateText(const std::string& meshName, unsigned numRow, unsigned numCol) {
+	Vertex v;
+	std::vector<Vertex> vertex_buffer_data;
+	std::vector<GLuint> index_buffer_data;
+	float width = 1.f / numCol;
+	float height = 1.f / numRow;
+	unsigned offset = 0;
+	for (unsigned row = 0; row < numRow; ++row)
+	{
+		for (unsigned col = 0; col < numCol; ++col)
+		{
+			v.pos.Set(0.5, 0.5, 0); v.texCoord.Set(width * (col + 1), height * (numRow - row)), v.normal.Set(0, 0, 1); vertex_buffer_data.push_back(v);
+			v.pos.Set(-0.5, 0.5, 0); v.texCoord.Set(width * (col), height * (numRow - row)), v.normal.Set(0, 0, 1); vertex_buffer_data.push_back(v);
+			v.pos.Set(-0.5, -0.5, 0); v.texCoord.Set(width * (col), height * (numRow - row - 1)), v.normal.Set(0, 0, 1); vertex_buffer_data.push_back(v);
+			v.pos.Set(0.5, -0.5, 0); v.texCoord.Set(width * (col + 1), height * (numRow - row - 1)), v.normal.Set(0, 0, 1); vertex_buffer_data.push_back(v);
+
+			//tri1
+			index_buffer_data.push_back(0 + offset);
+			index_buffer_data.push_back(1 + offset);
+			index_buffer_data.push_back(2 + offset);
+			//tri2
+			index_buffer_data.push_back(0 + offset);
+			index_buffer_data.push_back(2 + offset);
+			index_buffer_data.push_back(3 + offset);
+
+			offset += 4;
+		}
+	}
+
+	Mesh* mesh = new Mesh(meshName);
+	glBindBuffer(GL_ARRAY_BUFFER, mesh->vertexBuffer);
+	glBufferData(GL_ARRAY_BUFFER, vertex_buffer_data.size() * sizeof(Vertex), &vertex_buffer_data[0], GL_STATIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->indexBuffer);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, index_buffer_data.size() * sizeof(GLuint), &index_buffer_data[0], GL_STATIC_DRAW);
+	mesh->mode = Mesh::DRAW_TRIANGLES;
+	mesh->indexSize = index_buffer_data.size();
+	return mesh;
+
 }

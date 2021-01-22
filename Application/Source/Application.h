@@ -7,6 +7,7 @@
 class Application
 {
 public:
+
 	Application();
 	~Application();
 	void Init();
@@ -27,6 +28,7 @@ private:
 	//Declare a window object
 	bool GetMouseUpdate();
 	StopWatch m_timer;
+	
 };
 
 #endif

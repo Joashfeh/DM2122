@@ -158,12 +158,12 @@ void Assignment2::Init()
 	meshList[GEO_CIRCLE] = MeshBuilder::GenerateCircle("Circle", Color(1, 1, 1), 48);
 	meshList[GEO_FLOOR] = MeshBuilder::GenerateQuad("Floor", Color(1, 1, 1), 1.f);
 
+	player.position.Set(0, 0, 0);
+
 	Mtx44 projection;
 	projection.SetToPerspective(45.f, 4.f / 3.f, 0.1f, 1000.f);
 	projectionStack.LoadMatrix(projection);
 	camera.Init(Vector3(0, player.position.y + 2.4, -15), Vector3(0, player.position.y + 2.4, 0), Vector3(0, 1, 0));
-
-	player.position.Set(0, 0, 0);
 
 	bodyDirectionAngle = 90;
 	bodySize = 0.5;
@@ -229,18 +229,16 @@ void Assignment2::Init()
 	}
 
 	World.push_back(new Blocks(BRICK, Position(8, 1, 0), 2, 2, 2));
+	World.push_back(new Blocks(BRICK, Position(8, 10, 0), 2, 2, 2));
 
 }
            
 void Assignment2::Update(double dt) {
 
-	player.grounded = false;
-	player.leftWallContact = false;
-	player.rightWallContact = false;
-	for(int i = 0; i < World.size(); ++i)
-		player.Collision(*World[i]);
-
 	UpdateHandler(bodyDirectionAngle, jump, dt);
+	player.grounded = false;
+	for (int i = 0; i < World.size(); ++i)
+		player.Collision(*World[i]);
 	camera.Update(dt);
 	const float LSPEED = 10.f;
 
@@ -504,7 +502,7 @@ void Assignment2::RenderMario() {
 
 	// Body
 	modelStack.PushMatrix();
-	modelStack.Translate(player.position.x, player.position.y, player.position.z);
+	modelStack.Translate(player.position.x, player.position.y - 1.5, player.position.z);
 	modelStack.Rotate(bodyDirectionAngle, 0, 1, 0);
 	modelStack.Scale(bodySize, bodySize, bodySize);
 	modelStack.Translate(0, 2.4, 0);
@@ -1480,7 +1478,7 @@ void Assignment2::RenderHead() {
 void Assignment2::RenderBlocks() {
 	for (int i = 0; i < World.size(); ++i) {
 		modelStack.PushMatrix();
-		modelStack.Translate(World[i]->position.x, World[i]->position.y + 0.4, World[i]->position.z);
+		modelStack.Translate(World[i]->position.x, World[i]->position.y, World[i]->position.z);
 		modelStack.Scale(1.1, 1.1, 1.1);
 		RenderMesh(meshList[GEO_BRICK], toggleLight);
 		modelStack.PopMatrix();

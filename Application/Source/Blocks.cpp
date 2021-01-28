@@ -14,14 +14,14 @@ Blocks::Blocks(BLOCK_TYPE type, Position pos, float xSize, float ySize, float zS
 	this->ySize = ySize;
 	this->zSize = zSize;
 
-	minX = position.x - xSize;
-	maxX = position.x + xSize;
+	minX = position.x - xSize / 2;
+	maxX = position.x + xSize / 2;
 
-	minY = position.y - ySize;
-	maxY = position.y + ySize;
+	minY = position.y - ySize / 2;
+	maxY = position.y + ySize / 2;
 
-	minZ = position.z - zSize;
-	maxZ = position.z + zSize;
+	minZ = position.z - zSize / 2;
+	maxZ = position.z + zSize / 2;
 }
 
 bool Blocks::Collision(Entities& entity) {

@@ -3,7 +3,7 @@
 
 #include "Light.h"
 #include "Scene.h"
-#include "Camera4.h"
+#include "Camera5.h"
 #include "Mesh.h"
 #include "MatrixStack.h"
 #include "Mario.h"
@@ -131,7 +131,7 @@ private:
 	Light light[2];
 	MS modelStack, viewStack, projectionStack;
 
-	Camera4 camera;
+	Camera5 camera;
 	Mesh* meshList[NUM_GEOMETRY];
 	unsigned m_vertexArrayID;
 	unsigned m_parameters[U_TOTAL];

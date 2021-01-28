@@ -8,9 +8,9 @@ Mario::~Mario() {
 }
 
 void Mario::Init() {
-    this->position.Set(0, 0, 0);
-    xSize = 2.4f;
-    ySize = 5.2f;
+    this->position.Set(0, 50, 0);
+    xSize = 0.8f;
+    ySize = 3.4f;
     zSize = 1.f;
 
     minX = position.x - xSize;
@@ -24,10 +24,8 @@ void Mario::Init() {
 }
 
 bool AABB(Entities& a, Entities& b) {
-    return (a.position.x <= b.position.x + b.xSize - b.xSize/4) &&
-        ((a.position.x + a.xSize - a.xSize/4) >= b.position.x) &&
-        (a.position.y <= (b.position.y + b.ySize)) &&
-        (a.position.y + a.ySize) >= b.position.y;
+    return (a.xSize / 2 + b.xSize / 2) > abs(b.position.x - a.position.x) &&
+        (a.ySize / 2 + b.ySize / 2) > abs(b.position.y - a.position.y);
 }
 
 bool Mario::Collision(Entities& entity) {
@@ -35,19 +33,24 @@ bool Mario::Collision(Entities& entity) {
         if (this->position.y >= entity.position.y)
         {
             grounded = true;
-            return true;
         }
 
-        if (this->position.y < entity.position.y && this->maxX <= entity.minX)
-        {
-            rightWallContact = true;
-            return true;
-        }
+        float displacementX = entity.position.x - this->position.x;
+        float displacementY = entity.position.y - this->position.y;
 
-        if (this->position.y < entity.position.y && this->minX <= entity.maxX)
-        {
-            leftWallContact = true;
-            return true;
+        if (abs(displacementX) > abs(displacementY)) {
+            if (displacementX < 0)
+                this->position.x += (xSize / 2 + entity.xSize / 2) + displacementX;
+
+            if (displacementX > 0)
+                this->position.x -= (xSize / 2 + entity.xSize / 2) - displacementX;
+        }
+        else {
+            if (displacementY < 0)
+                this->position.y += (ySize / 2 + entity.ySize / 2) + displacementY;
+
+            if (displacementY > 0)
+                this->position.y -= (ySize / 2 + entity.ySize / 2) - displacementY;
         }
     }
     else

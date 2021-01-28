@@ -13,11 +13,11 @@ void UpdateHandler(float& bodyAngle, bool& jump, double dt) {
 
 // Movement
 void MovementHandler(float& bodyAngle, double dt) {
-	if (Application::IsKeyPressed('A') && !Assignment2::player.leftWallContact) {
+	if (Application::IsKeyPressed('A')) {
 		bodyAngle = 270;
 		Assignment2::player.position.x -= 0.3;
 	}
-	if (Application::IsKeyPressed('D') && !Assignment2::player.rightWallContact) {
+	if (Application::IsKeyPressed('D')) {
 		bodyAngle = 90;
 		Assignment2::player.position.x += 0.3;
 	}

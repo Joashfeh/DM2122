@@ -24,7 +24,9 @@ public:
 	static Mesh* GenerateCone(const std::string& meshName, Color color, unsigned numSlice, float rad = 1.f, float height = 1.f);
 	static Mesh* GenerateTorus(const std::string& meshName, Color color, unsigned numstack, unsigned numslice, float outerR = 1.f, float innerR = 0.5f);
 	static Mesh* GenerateOBJ(const std::string& meshName, const std::string& file_path);
+	static Mesh* GenerateOBJMTL(const std::string& meshName, const std::string& file_path, const std::string& mtl_path);
 	static Mesh* GenerateText(const std::string& meshName, unsigned numRow, unsigned numCol);
+
 };
 
 #endif

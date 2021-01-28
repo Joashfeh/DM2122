@@ -69,6 +69,9 @@ class SceneModel : public Scene {
 		GEO_MODEL4,
 		GEO_MODEL5,
 		GEO_MODEL6,
+		GEO_MODEL7,
+		GEO_MODEL8,
+		GEO_BRICK,
 		GEO_FLOOR,
 		NUM_GEOMETRY,
 	};

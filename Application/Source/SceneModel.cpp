@@ -57,9 +57,16 @@ void SceneModel::Init()
 	m_parameters[U_COLOR_TEXTURE] = glGetUniformLocation(m_programID, "colorTexture");
 	m_parameters[U_NUMLIGHTS] = glGetUniformLocation(m_programID, "numLights");
 
-	light[0].type = Light::LIGHT_POINT;
-	light[0].position.Set(0, 5, 0);
-	light[0].color.Set(1, 1, 0);
+	Mesh::SetMaterialLoc(
+		m_parameters[U_MATERIAL_AMBIENT],
+		m_parameters[U_MATERIAL_DIFFUSE],
+		m_parameters[U_MATERIAL_SPECULAR],
+		m_parameters[U_MATERIAL_SHININESS]
+	);
+
+	light[0].type = Light::LIGHT_DIRECTIONAL;
+	light[0].position.Set(0, 70, 0);
+	light[0].color.Set(1, 1, 1);
 	light[0].power = 1;
 	light[0].kC = 1.f;
 	light[0].kL = 0.01f;
@@ -121,9 +128,15 @@ void SceneModel::Init()
 
 	meshList[GEO_MODEL6] = MeshBuilder::GenerateOBJ("model1", "OBJ//winebottle.obj");
 	meshList[GEO_MODEL6]->textureID = LoadTGA("Image//winebottle.tga");
+	meshList[GEO_BRICK] = MeshBuilder::GenerateOBJMTL("brick", "OBJ//Brick.obj", "OBJ//Brick.mtl");
+	meshList[GEO_MODEL7] = MeshBuilder::GenerateOBJMTL("model7", "OBJ//house_type01.obj", "OBJ//house_type01.mtl");
+
+	meshList[GEO_MODEL8] = MeshBuilder::GenerateOBJMTL("model8", "OBJ//cottage_obj.obj", "OBJ//cottage_obj.mtl");
+	meshList[GEO_MODEL8]->textureID = LoadTGA("Image//cottage_diffuse.tga");
+
+	
 
 	meshList[GEO_FLOOR] = MeshBuilder::GenerateQuad("Floor", Color(1, 1, 1), 1.f);
-
 
 	Mtx44 projection;
 	projection.SetToPerspective(45.f, 4.f / 3.f, 0.1f, 1000.f);
@@ -159,9 +172,7 @@ void SceneModel::Init()
 	glUniform1f(m_parameters[U_LIGHT1_COSCUTOFF], light[1].cosCutoff);
 	glUniform1f(m_parameters[U_LIGHT1_COSINNER], light[1].cosInner);
 	glUniform1f(m_parameters[U_LIGHT1_EXPONENT], light[1].exponent);
-	glUniform1i(m_parameters[U_NUMLIGHTS], 1);
-
-
+	glUniform1i(m_parameters[U_NUMLIGHTS], 2);
 
 }
 
@@ -210,13 +221,10 @@ void SceneModel::Update(double dt) {
 	if (Application::IsKeyPressed('P'))
 		light[0].position.y += (float)(LSPEED * dt);
 
-	if (Application::IsKeyPressed('Q')) {
-		if (toggleLight == true)
-			toggleLight = false;
-
-		else if(toggleLight == false)
-			toggleLight = true;
-	}
+	if (Application::IsKeyPressed('9'))
+		toggleLight = false;
+	if (Application::IsKeyPressed('0'))
+		toggleLight = true;
 		
 }
 
@@ -264,7 +272,7 @@ void SceneModel::Render() {
 	RenderMesh(meshList[GEO_BLOB], false);
 	modelStack.PopMatrix();*/
 
-	modelStack.PushMatrix();
+	/*modelStack.PushMatrix();
 	modelStack.Translate(0, 9.2, 0);
 	RenderMesh(meshList[GEO_MODEL1], toggleLight);
 	modelStack.PopMatrix();
@@ -293,6 +301,14 @@ void SceneModel::Render() {
 	modelStack.PushMatrix();
 	modelStack.Translate(0, 10, 10);
 	RenderMesh(meshList[GEO_MODEL6], toggleLight);
+	modelStack.PopMatrix();*/
+
+	modelStack.PushMatrix();
+	RenderMesh(meshList[GEO_MODEL7], toggleLight);
+	modelStack.PopMatrix();
+
+	modelStack.PushMatrix();
+	RenderMesh(meshList[GEO_BRICK], toggleLight);
 	modelStack.PopMatrix();
 
 }

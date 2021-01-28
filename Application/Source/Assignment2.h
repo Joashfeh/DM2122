@@ -6,6 +6,9 @@
 #include "Camera4.h"
 #include "Mesh.h"
 #include "MatrixStack.h"
+#include "Mario.h"
+#include "Entities.h"
+#include <vector>
 
 class Assignment2 : public Scene {
 
@@ -73,13 +76,15 @@ class Assignment2 : public Scene {
 		GEO_MODEL4,
 		GEO_MODEL5,
 		GEO_MODEL6,
+		GEO_BRICK,
 		GEO_FLOOR,
 		NUM_GEOMETRY,
 	};
 
 public:
 
-	static Vector3 MarioPos;
+	std::vector<Entities*> World;
+	static Mario player;
 
 	Assignment2();
 	~Assignment2();

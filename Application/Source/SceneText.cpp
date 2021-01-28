@@ -446,11 +446,9 @@ void SceneText::RenderText(Mesh* mesh, std::string text, Color color)
 	for (unsigned i = 0; i < text.length(); ++i)
 	{
 		Mtx44 characterSpacing;
-		characterSpacing.SetToTranslation(0 + accumulator, 0, i * 0.001f);
-		Mtx44 MVP = projectionStack.Top() * viewStack.Top() *
-		modelStack.Top() * characterSpacing;
-		glUniformMatrix4fv(m_parameters[U_MVP], 1, GL_FALSE,
-			&MVP.a[0]);
+		characterSpacing.SetToTranslation(0.5f + accumulator, 0.5f, i * 0.001f);
+		Mtx44 MVP = projectionStack.Top() * viewStack.Top() * modelStack.Top() * characterSpacing;
+		glUniformMatrix4fv(m_parameters[U_MVP], 1, GL_FALSE, &MVP.a[0]);
 		mesh->Render((unsigned)text[i] * 6, 6);
 
 		accumulator += textWidthData[text[i]] / 64.0f;

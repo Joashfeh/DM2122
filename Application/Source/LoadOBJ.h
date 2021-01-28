@@ -4,12 +4,29 @@
 #include <vector>
 #include "Vertex.h"
 #include "Vector3.h"
+#include "Material.h"
+#include <map>
 
 bool LoadOBJ(
 	const char *file_path, 
 	std::vector<Position> & out_vertices, 
 	std::vector<TexCoord> & out_uvs, 
 	std::vector<Vector3> & out_normals
+);
+
+bool LoadOBJMTL(
+	const char* file_path, 
+	const char* mtl_path, 
+	std::vector<Position>& out_vertices, 
+	std::vector<TexCoord>& out_uvs, 
+	std::vector<Vector3>& out_normals, 
+	std::vector<Material>& out_materials
+);
+
+bool LoadMTL(
+	const char* file_path, 
+	std::map<std::string,
+	Material*>& materials_map
 );
 
 void IndexVBO(

@@ -10,6 +10,7 @@ public:
 	float yaw;
 
 	Vector3 position;
+	Vector3 sideViewTarget;
 	Vector3 PositionVector;
 	Vector3 target;
 	Vector3 up;

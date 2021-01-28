@@ -7,8 +7,9 @@
 #include "Utility.h"
 #include "LoadTGA.h"
 #include "UpdateHandler.h"
+#include "Blocks.h"
 
-Vector3 Assignment2::MarioPos;
+Mario Assignment2::player;
 
 Assignment2::Assignment2()
 {
@@ -60,28 +61,35 @@ void Assignment2::Init()
 	m_parameters[U_COLOR_TEXTURE] = glGetUniformLocation(m_programID, "colorTexture");
 	m_parameters[U_NUMLIGHTS] = glGetUniformLocation(m_programID, "numLights");
 
-	light[0].type = Light::LIGHT_POINT;
-	light[0].position.Set(0, 5, 0);
-	light[0].color.Set(1, 1, 0);
-	light[0].power = 1;
+	Mesh::SetMaterialLoc(
+		m_parameters[U_MATERIAL_AMBIENT],
+		m_parameters[U_MATERIAL_DIFFUSE],
+		m_parameters[U_MATERIAL_SPECULAR],
+		m_parameters[U_MATERIAL_SHININESS]
+	);
+
+	light[0].type = Light::LIGHT_DIRECTIONAL;
+	light[0].position.Set(10, 50, 0);
+	light[0].color.Set(0.8, 0.8, 0.8);
+	light[0].power = 1.0f;
 	light[0].kC = 1.f;
 	light[0].kL = 0.01f;
 	light[0].kQ = 0.001f;
 	light[0].cosCutoff = cos(Math::DegreeToRadian(45));
 	light[0].cosInner = cos(Math::DegreeToRadian(30));
-	light[0].exponent = 3.f;
+	light[0].exponent = 1.f;
 	light[0].spotDirection.Set(0.f, 0.f, 0.f);
 
 	light[1].type = Light::LIGHT_POINT;
-	light[1].position.Set(0, 5, 0);
+	light[1].position.Set(0, 50, 0);
 	light[1].color.Set(1, 1, 1);
-	light[1].power = 1;
+	light[1].power = 1.0f;
 	light[1].kC = 1.f;
 	light[1].kL = 0.01f;
 	light[1].kQ = 0.001f;
 	light[1].cosCutoff = cos(Math::DegreeToRadian(45));
 	light[1].cosInner = cos(Math::DegreeToRadian(30));
-	light[1].exponent = 3.f;
+	light[1].exponent = 1.f;
 	light[1].spotDirection.Set(2.f, 1.f, 0.f);
 
 	meshList[GEO_QUAD] = MeshBuilder::GenerateQuad("quad", Color(1, 1, 1), 1.f);
@@ -145,19 +153,20 @@ void Assignment2::Init()
 	meshList[GEO_MODEL6] = MeshBuilder::GenerateOBJ("model1", "OBJ//winebottle.obj");
 	meshList[GEO_MODEL6]->textureID = LoadTGA("Image//winebottle.tga");
 
+	meshList[GEO_BRICK] = MeshBuilder::GenerateOBJMTL("brick", "OBJ//Brick.obj", "OBJ//Brick.mtl");
+
 	meshList[GEO_CIRCLE] = MeshBuilder::GenerateCircle("Circle", Color(1, 1, 1), 48);
 	meshList[GEO_FLOOR] = MeshBuilder::GenerateQuad("Floor", Color(1, 1, 1), 1.f);
-
 
 	Mtx44 projection;
 	projection.SetToPerspective(45.f, 4.f / 3.f, 0.1f, 1000.f);
 	projectionStack.LoadMatrix(projection);
-	camera.Init(Vector3(0, MarioPos.y + 2.4, -15), Vector3(0, MarioPos.y + 2.4, 0), Vector3(0, 1, 0));
+	camera.Init(Vector3(0, player.position.y + 2.4, -15), Vector3(0, player.position.y + 2.4, 0), Vector3(0, 1, 0));
 
-	MarioPos.Set(0, 0, 0);
+	player.position.Set(0, 0, 0);
 
-	bodyDirectionAngle = 0;
-	bodySize = 1;
+	bodyDirectionAngle = 90;
+	bodySize = 0.5;
 	bodyAngle = 0;
 	headAngle = 0;
 
@@ -213,17 +222,26 @@ void Assignment2::Init()
 	glUniform1f(m_parameters[U_LIGHT1_COSCUTOFF], light[1].cosCutoff);
 	glUniform1f(m_parameters[U_LIGHT1_COSINNER], light[1].cosInner);
 	glUniform1f(m_parameters[U_LIGHT1_EXPONENT], light[1].exponent);
-	glUniform1i(m_parameters[U_NUMLIGHTS], 1);
+	glUniform1i(m_parameters[U_NUMLIGHTS], 2);
 
+	for (int i = 0; i < 448; i += 2) {
+		World.push_back(new Blocks(BRICK, Position(i, -1, 0), 2, 2, 2));
+	}
 
+	World.push_back(new Blocks(BRICK, Position(8, 1, 0), 2, 2, 2));
 
 }
-
+           
 void Assignment2::Update(double dt) {
 
-	MovementHandler(bodyDirectionAngle, dt);
+	player.grounded = false;
+	player.leftWallContact = false;
+	player.rightWallContact = false;
+	for(int i = 0; i < World.size(); ++i)
+		player.Collision(*World[i]);
+
+	UpdateHandler(bodyDirectionAngle, jump, dt);
 	camera.Update(dt);
-	bodyDirectionAngle -= Application::camera_yaw * 45.0f * static_cast<float>(dt);
 	const float LSPEED = 10.f;
 
 	if (Application::IsKeyPressed('1'))
@@ -275,15 +293,7 @@ void Assignment2::Update(double dt) {
 
 	// Movement Control
 	{
-		if (Application::IsKeyPressed('W'))
-		{
-			running = true;
-		}
 		if (Application::IsKeyPressed('A'))
-		{
-			running = true;
-		}
-		if (Application::IsKeyPressed('S'))
 		{
 			running = true;
 		}
@@ -297,14 +307,13 @@ void Assignment2::Update(double dt) {
 
 	// Scale Control
 	if (Application::IsKeyPressed('Q'))
-		scaling = true;
-
-	// Jump Control
-	if (Application::IsKeyPressed(VK_SPACE))
-		jump = true;
+		scaling = true;	
 
 	// Function Updates
 	{
+		if (running && jump)
+			ModelJump(dt);
+
 		if (running && !jump)
 			ModelRun(dt);
 
@@ -358,12 +367,10 @@ void Assignment2::Render() {
 
 	RenderSkybox();
 	RenderMario();
-	RenderFloor();
+	RenderBlocks();
+	//RenderFloor();
 	RenderMesh(meshList[GEO_AXES], false);
 
-	/*modelStack.PushMatrix();
-	RenderMesh(meshList[GEO_BLOB], false);
-	modelStack.PopMatrix();*/
 
 	modelStack.PushMatrix();
 	modelStack.Translate(light[0].position.x, light[0].position.y, light[0].position.z);
@@ -466,6 +473,7 @@ void Assignment2::RenderSkybox()
 
 	modelStack.PushMatrix();
 	modelStack.Translate(0, 500, 0);
+	modelStack.Rotate(90, 0, 1, 0);
 	modelStack.Rotate(90, 1, 0, 0);
 	modelStack.Scale(1000, 1000, 1000);
 	RenderMesh(meshList[GEO_TOP], false);
@@ -496,7 +504,7 @@ void Assignment2::RenderMario() {
 
 	// Body
 	modelStack.PushMatrix();
-	modelStack.Translate(MarioPos.x, MarioPos.y, MarioPos.z);
+	modelStack.Translate(player.position.x, player.position.y, player.position.z);
 	modelStack.Rotate(bodyDirectionAngle, 0, 1, 0);
 	modelStack.Scale(bodySize, bodySize, bodySize);
 	modelStack.Translate(0, 2.4, 0);
@@ -687,7 +695,7 @@ void Assignment2::RenderLeftArm()
 
 	}
 	modelStack.PopMatrix();
-}
+}				
 
 void Assignment2::RenderRightLeg()
 {
@@ -929,7 +937,7 @@ void Assignment2::RenderLeftLeg()
 		modelStack.PopMatrix();
 
 	}
-}
+}		
 
 void Assignment2::RenderRightArm()
 {
@@ -1017,7 +1025,7 @@ void Assignment2::RenderRightArm()
 
 	}
 }
-
+		
 void Assignment2::RenderHead() {
 	// Head
 	modelStack.PushMatrix();
@@ -1469,6 +1477,17 @@ void Assignment2::RenderHead() {
 	modelStack.PopMatrix();
 }
 
+void Assignment2::RenderBlocks() {
+	for (int i = 0; i < World.size(); ++i) {
+		modelStack.PushMatrix();
+		modelStack.Translate(World[i]->position.x, World[i]->position.y + 0.4, World[i]->position.z);
+		modelStack.Scale(1.1, 1.1, 1.1);
+		RenderMesh(meshList[GEO_BRICK], toggleLight);
+		modelStack.PopMatrix();
+	}
+
+}
+
 void Assignment2::ModelRun(double dt)
 {
 	time += dt * 15;
@@ -1495,22 +1514,26 @@ void Assignment2::ModelJump(double dt)
 {
 	time += dt * 12;
 
-	MarioPos.y = 5 * sin(time) + 5;
-	bodyAngle = -(7.5 * sin(time) + 7.5);
+	// MarioPos.y = 5 * sin(time) + 5;
+	bodyAngle = -15;
 
-	rightHipAngle = -(50 * sin(time) + 50);
-	rightKneeAngle = (35 * sin(time) + 35);
+	rightHipAngle = -100;
+	rightKneeAngle = 70;
 
-	leftHipAngle = (25 * sin(time) + 25);
-	leftKneeAngle = (10 * sin(time) + 10);
+	leftHipAngle = 50;
+	leftKneeAngle = 20;
 
-	rightShoulderAngle = (35 * sin(time) + 35);
-	leftShoulderAngle = (70 * sin(time) + 70);
+	rightShoulderAngle = 70;
+	leftShoulderAngle = 140;
 
-	if (time > 4.5) {
+	//if (time > 4.5) {
+	//	jump = false;
+	//	MarioPos.y = 0;
+	//	return;
+	//}
+
+	if (player.position.y == 0) {
 		jump = false;
-		MarioPos.y = 0;
-		return;
 	}
 
 }
@@ -1521,19 +1544,19 @@ void Assignment2::ModelScale(double dt)
 
 	switch (frames) {
 	case 10:
-		bodySize = 1.33;
+		bodySize = 0.666;
 		break;
 	case 20:
-		bodySize = 1;
+		bodySize = 0.5;
 		break;
 	case 30:
-		bodySize = 1.66;
+		bodySize = 0.83;
 		break;
 	case 40:
-		bodySize = 1.33;
+		bodySize = 0.666;
 		break;
 	case 50:
-		bodySize = 2;
+		bodySize = 1;
 
 		break;
 	}
@@ -1562,3 +1585,4 @@ void Assignment2::ResetAnimation()
 	rightKneeAngle = 0;
 	leftKneeAngle = 0;
 }
+

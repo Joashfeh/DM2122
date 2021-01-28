@@ -16,3 +16,4 @@ void LoadTextData(int textDataArray[], std::string textDataCSV) {
 		textDataArray[i++] = std::stoi(line);
 	}
 }
+

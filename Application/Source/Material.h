@@ -11,6 +11,11 @@ struct Component
 	{
 		this->r = r; this->g = g; this->b = b;
 	}
+	Component& operator=(const Component& rhs)
+	{
+		Set(rhs.r, rhs.g, rhs.b);
+	}
+
 };
 
 struct Material
@@ -19,12 +24,22 @@ struct Material
 	Component kDiffuse;
 	Component kSpecular;
 	float kShininess;
+	float size;
 
 	Material() {
 		kAmbient.Set(0.1f, 0.1f, 0.1f);
 		kDiffuse.Set(0.6f, 0.6f, 0.6f);
 		kSpecular.Set(0.3f, 0.3f, 0.3f);
 		kShininess = 5.f;
+		size = 0.f;
+	}
+	Material& operator=(const Material& rhs)
+	{
+		kAmbient = rhs.kAmbient;
+		kDiffuse = rhs.kDiffuse;
+		kSpecular = rhs.kSpecular;
+		kShininess = rhs.kShininess;
+		size = rhs.size;
 	}
 
 };

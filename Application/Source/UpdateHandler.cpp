@@ -13,6 +13,7 @@ void UpdateHandler(float& bodyAngle, bool& jump, double dt) {
 
 // Movement
 void MovementHandler(float& bodyAngle, double dt) {
+
 	if (Application::IsKeyPressed('A')) {
 		bodyAngle = 270;
 		Assignment2::player.position.x -= 0.3;

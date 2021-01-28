@@ -3,6 +3,7 @@
 
 #include "Light.h"
 #include "Scene.h"
+#include "Camera4.h"
 #include "Camera5.h"
 #include "Mesh.h"
 #include "MatrixStack.h"
@@ -47,6 +48,8 @@ class Assignment2 : public Scene {
 		U_NUMLIGHTS,
 		U_COLOR_TEXTURE_ENABLED,
 		U_COLOR_TEXTURE,
+		U_TEXT_ENABLED,
+		U_TEXT_COLOR,
 		U_TOTAL,
 	};
 
@@ -78,6 +81,7 @@ class Assignment2 : public Scene {
 		GEO_MODEL6,
 		GEO_BRICK,
 		GEO_FLOOR,
+		GEO_TEXT,
 		NUM_GEOMETRY,
 	};
 
@@ -95,6 +99,8 @@ public:
 	virtual void Exit();
 
 private:
+
+	int textWidthData[256];
 
 	int frames;
 
@@ -138,6 +144,7 @@ private:
 	unsigned m_programID;
 
 	void RenderMesh(Mesh* mesh, bool enableLight);
+	void RenderTextOnScreen(Mesh* mesh, std::string text, Color color, float size, float x, float y);
 	void RenderSkybox();
 	void RenderFloor();
 

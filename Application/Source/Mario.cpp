@@ -30,10 +30,6 @@ bool AABB(Entities& a, Entities& b) {
 
 bool Mario::Collision(Entities& entity) {
     if (AABB(*this, entity)) {
-        if (this->position.y >= entity.position.y)
-        {
-            grounded = true;
-        }
 
         float displacementX = entity.position.x - this->position.x;
         float displacementY = entity.position.y - this->position.y;
@@ -46,8 +42,10 @@ bool Mario::Collision(Entities& entity) {
                 this->position.x -= (xSize / 2 + entity.xSize / 2) - displacementX;
         }
         else {
-            if (displacementY < 0)
+            if (displacementY < 0) {
                 this->position.y += (ySize / 2 + entity.ySize / 2) + displacementY;
+                grounded = true;
+            }
 
             if (displacementY > 0)
                 this->position.y -= (ySize / 2 + entity.ySize / 2) - displacementY;

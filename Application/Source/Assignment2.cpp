@@ -7,6 +7,8 @@
 #include "Utility.h"
 #include "LoadTGA.h"
 #include "UpdateHandler.h"
+#include "LoadTextData.h"
+#include <sstream>
 #include "Blocks.h"
 
 Mario Assignment2::player;
@@ -26,7 +28,7 @@ void Assignment2::Init()
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	m_programID = LoadShaders("Shader//Texture.vertexshader", "Shader//Blending.fragmentshader");
+	m_programID = LoadShaders("Shader//Texture.vertexshader", "Shader//Text.fragmentshader");
 	m_parameters[U_MVP] = glGetUniformLocation(m_programID, "MVP");
 	m_parameters[U_MODELVIEW] = glGetUniformLocation(m_programID, "MV");
 	m_parameters[U_MODELVIEW_INVERSE_TRANSPOSE] = glGetUniformLocation(m_programID, "MV_inverse_transpose");
@@ -60,6 +62,8 @@ void Assignment2::Init()
 	m_parameters[U_COLOR_TEXTURE_ENABLED] = glGetUniformLocation(m_programID, "colorTextureEnabled");
 	m_parameters[U_COLOR_TEXTURE] = glGetUniformLocation(m_programID, "colorTexture");
 	m_parameters[U_NUMLIGHTS] = glGetUniformLocation(m_programID, "numLights");
+	m_parameters[U_TEXT_ENABLED] = glGetUniformLocation(m_programID, "textEnabled");
+	m_parameters[U_TEXT_COLOR] = glGetUniformLocation(m_programID, "textColor");
 
 	Mesh::SetMaterialLoc(
 		m_parameters[U_MATERIAL_AMBIENT],
@@ -69,7 +73,7 @@ void Assignment2::Init()
 	);
 
 	light[0].type = Light::LIGHT_DIRECTIONAL;
-	light[0].position.Set(10, 50, 0);
+	light[0].position.Set(0, 50, 30);
 	light[0].color.Set(0.8, 0.8, 0.8);
 	light[0].power = 1.0f;
 	light[0].kC = 1.f;
@@ -81,7 +85,7 @@ void Assignment2::Init()
 	light[0].spotDirection.Set(0.f, 0.f, 0.f);
 
 	light[1].type = Light::LIGHT_POINT;
-	light[1].position.Set(0, 50, 0);
+	light[1].position.Set(0, 50, 50);
 	light[1].color.Set(1, 1, 1);
 	light[1].power = 1.0f;
 	light[1].kC = 1.f;
@@ -158,7 +162,10 @@ void Assignment2::Init()
 	meshList[GEO_CIRCLE] = MeshBuilder::GenerateCircle("Circle", Color(1, 1, 1), 48);
 	meshList[GEO_FLOOR] = MeshBuilder::GenerateQuad("Floor", Color(1, 1, 1), 1.f);
 
-	player.position.Set(0, 0, 0);
+	meshList[GEO_TEXT] = MeshBuilder::GenerateText("text", 16, 16);
+	meshList[GEO_TEXT]->textureID = LoadTGA("Image//Arial.tga");
+
+	player.position.Set(-15, 0, 0);
 
 	Mtx44 projection;
 	projection.SetToPerspective(45.f, 4.f / 3.f, 0.1f, 1000.f);
@@ -231,15 +238,25 @@ void Assignment2::Init()
 	World.push_back(new Blocks(BRICK, Position(8, 1, 0), 2, 2, 2));
 	World.push_back(new Blocks(BRICK, Position(8, 10, 0), 2, 2, 2));
 
+	for (int i = -16; i < 0; i += 2) {
+		World.push_back(new Blocks(BRICK, Position(i, -1, 0), 2, 2, 2));
+	}
+
 }
            
 void Assignment2::Update(double dt) {
 
 	UpdateHandler(bodyDirectionAngle, jump, dt);
 	player.grounded = false;
+
+	if (player.position.x < camera.position.x - 16)
+		player.position.x = camera.position.x - 16;
+
 	for (int i = 0; i < World.size(); ++i)
 		player.Collision(*World[i]);
+
 	camera.Update(dt);
+
 	const float LSPEED = 10.f;
 
 	if (Application::IsKeyPressed('1'))
@@ -375,6 +392,12 @@ void Assignment2::Render() {
 	modelStack.Scale(0.1, 0.1, 0.1);
 	RenderMesh(meshList[GEO_LIGHTBALL], false);
 	modelStack.PopMatrix();
+
+	std::stringstream ss;
+	ss.precision(4);
+	ss << "FPS: " << "60";
+	RenderTextOnScreen(meshList[GEO_TEXT], ss.str(), Color(1, 1, 1), 4, 0, 55);
+
 
 	Position lightPosition_cameraspace = viewStack.Top() * light[0].position;
 	glUniform3fv(m_parameters[U_LIGHT0_POSITION], 1, &lightPosition_cameraspace.x);
@@ -1480,7 +1503,15 @@ void Assignment2::RenderBlocks() {
 		modelStack.PushMatrix();
 		modelStack.Translate(World[i]->position.x, World[i]->position.y, World[i]->position.z);
 		modelStack.Scale(1.1, 1.1, 1.1);
-		RenderMesh(meshList[GEO_BRICK], toggleLight);
+
+		switch (((Blocks*)World[i])->blockType) {
+		case BARRIER:
+			break;
+		case BRICK:
+			RenderMesh(meshList[GEO_BRICK], toggleLight);
+			break;
+		}
+
 		modelStack.PopMatrix();
 	}
 
@@ -1504,7 +1535,7 @@ void Assignment2::ModelRun(double dt)
 	rightHipAngle = -75 * sin(time) - 15;
 	rightKneeAngle = -17.5 * sin(time) + 22.5;
 
-	//MarioPos.y = 0.2 * sin(time * 2) + 0.1;
+	//player.position.y = 0.2 * sin(time * 2) + 0.1;
 
 }
 
@@ -1542,23 +1573,22 @@ void Assignment2::ModelScale(double dt)
 
 	switch (frames) {
 	case 10:
-		bodySize = 0.666;
+		bodySize = 0.575;
 		break;
 	case 20:
 		bodySize = 0.5;
 		break;
 	case 30:
-		bodySize = 0.83;
+		bodySize = 0.625;
 		break;
 	case 40:
-		bodySize = 0.666;
+		bodySize = 0.575;
 		break;
 	case 50:
-		bodySize = 1;
+		bodySize = 0.675;
 
 		break;
 	}
-
 
 }
 
@@ -1582,5 +1612,53 @@ void Assignment2::ResetAnimation()
 	// Left Leg
 	rightKneeAngle = 0;
 	leftKneeAngle = 0;
+}
+
+
+void Assignment2::RenderTextOnScreen(Mesh* mesh, std::string text, Color color, float size, float x, float y)
+{
+	LoadTextData(textWidthData, "TextData//ArialFontData.csv");
+	if (!mesh || mesh->textureID <= 0) //Proper error check
+		return;
+	glDisable(GL_DEPTH_TEST);
+
+	Mtx44 ortho;
+	ortho.SetToOrtho(0, 80, 0, 60, -10, 10); //size of screen UI
+	projectionStack.PushMatrix();
+	projectionStack.LoadMatrix(ortho);
+	viewStack.PushMatrix();
+	viewStack.LoadIdentity(); //No need camera for ortho mode
+	modelStack.PushMatrix();
+	modelStack.LoadIdentity(); //Reset modelStack
+	modelStack.Translate(x, y, 0);
+	modelStack.Scale(size, size, size);
+
+	glUniform1i(m_parameters[U_TEXT_ENABLED], 1);
+	glUniform3fv(m_parameters[U_TEXT_COLOR], 1, &color.r);
+	glUniform1i(m_parameters[U_LIGHTENABLED], 0);
+	glUniform1i(m_parameters[U_COLOR_TEXTURE_ENABLED], 1);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, mesh->textureID);
+	glUniform1i(m_parameters[U_COLOR_TEXTURE], 0);
+
+	float accumulator = 0;
+	for (unsigned i = 0; i < text.length(); ++i)
+	{
+		Mtx44 characterSpacing;
+		characterSpacing.SetToTranslation(0.5f + accumulator, 0.5f, 0);
+		Mtx44 MVP = projectionStack.Top() * viewStack.Top() * modelStack.Top() * characterSpacing;
+		glUniformMatrix4fv(m_parameters[U_MVP], 1, GL_FALSE, &MVP.a[0]);
+		mesh->Render((unsigned)text[i] * 6, 6);
+
+		accumulator += textWidthData[text[i]] / 64.0f;
+	}
+
+	projectionStack.PopMatrix();
+	viewStack.PopMatrix();
+	modelStack.PopMatrix();
+
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glUniform1i(m_parameters[U_TEXT_ENABLED], 0);
+	glEnable(GL_DEPTH_TEST);
 }
 

@@ -2,6 +2,7 @@
 #include "Entities.h"
 
 enum BLOCK_TYPE {
+	BARRIER, 
 	BRICK,
 	QUESTION_BRICK,
 };

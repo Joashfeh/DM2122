@@ -13,7 +13,7 @@ public:
 	BLOCK_TYPE blockType;
 
 	Blocks();
-	Blocks(BLOCK_TYPE type, Position pos, float xSize, float ySize, float zSize);
+	Blocks(BLOCK_TYPE type, Vector3 pos, float xSize, float ySize, float zSize);
 	~Blocks();
 
 	bool Collision(Entities& entity);

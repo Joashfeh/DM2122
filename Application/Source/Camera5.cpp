@@ -14,10 +14,9 @@ Camera5::~Camera5()
 
 void Camera5::Init(const Vector3& pos, const Vector3& target, const Vector3& up)
 {
-	this->position = defaultPosition = pos;
-	position = Vector3(0, 8, 30);
+	this->position = defaultPosition = Vector3(0, 6, 40);
 	this->PositionVector = position - Vector3(Assignment2::player.position.x, Assignment2::player.position.y, Assignment2::player.position.z);
-	this->target = defaultTarget = Vector3(0, 8, 0);
+	this->target = defaultTarget = Vector3(0, 12, 0);
 	Vector3 view = (target - position).Normalized();
 	Vector3 right = view.Cross(up);
 	right.y = 0;

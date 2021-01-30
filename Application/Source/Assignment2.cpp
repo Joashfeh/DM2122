@@ -165,7 +165,7 @@ void Assignment2::Init()
 	meshList[GEO_TEXT] = MeshBuilder::GenerateText("text", 16, 16);
 	meshList[GEO_TEXT]->textureID = LoadTGA("Image//Arial.tga");
 
-	player.position.Set(-15, 0, 0);
+	player.position.Set(-15, 10, 0);
 
 	Mtx44 projection;
 	projection.SetToPerspective(45.f, 4.f / 3.f, 0.1f, 1000.f);
@@ -231,26 +231,22 @@ void Assignment2::Init()
 	glUniform1f(m_parameters[U_LIGHT1_EXPONENT], light[1].exponent);
 	glUniform1i(m_parameters[U_NUMLIGHTS], 2);
 
-	for (int i = 0; i < 448; i += 2) {
-		World.push_back(new Blocks(BRICK, Position(i, -1, 0), 2, 2, 2));
-	}
-
-	World.push_back(new Blocks(BRICK, Position(8, 1, 0), 2, 2, 2));
-	World.push_back(new Blocks(BRICK, Position(8, 10, 0), 2, 2, 2));
-
-	for (int i = -16; i < 0; i += 2) {
-		World.push_back(new Blocks(BRICK, Position(i, -1, 0), 2, 2, 2));
-	}
+	Generate1_1();
 
 }
            
 void Assignment2::Update(double dt) {
 
+	if (player.position.y < -20) {
+		player.Init();
+		camera.Reset();
+	}
+
 	UpdateHandler(bodyDirectionAngle, jump, dt);
 	player.grounded = false;
 
-	if (player.position.x < camera.position.x - 16)
-		player.position.x = camera.position.x - 16;
+	if (player.position.x < camera.position.x - 20)
+		player.position.x = camera.position.x - 20;
 
 	for (int i = 0; i < World.size(); ++i)
 		player.Collision(*World[i]);
@@ -345,8 +341,10 @@ void Assignment2::Update(double dt) {
 	}
 
 	// Reset
-	if (Application::IsKeyPressed('R'))
-		this->Init();
+	if (Application::IsKeyPressed('R')) {
+		player.Init();
+		camera.Reset();
+	}
 		
 }
 
@@ -384,7 +382,7 @@ void Assignment2::Render() {
 	RenderMario();
 	RenderBlocks();
 	//RenderFloor();
-	RenderMesh(meshList[GEO_AXES], false);
+	//RenderMesh(meshList[GEO_AXES], false);
 
 
 	modelStack.PushMatrix();
@@ -1590,6 +1588,38 @@ void Assignment2::ModelScale(double dt)
 		break;
 	}
 
+}
+
+void Assignment2::Generate1_1() {
+
+	int generateX = 0;
+
+	// first 69 blocks
+	for (int x = generateX; generateX < 138; generateX += 2) {
+		for (int y = 1; y < 9; y += 2) {
+			World.push_back(new Blocks(BRICK, Vector3(generateX, -y, 1), 2, 2, 2));
+			World.push_back(new Blocks(BRICK, Vector3(generateX, -y, -1), 2, 2, 2));
+		}
+	}
+
+	generateX += 8;
+
+	// after 2 empty spaces
+	for (int x = generateX; generateX - x < 30; generateX += 2) {
+		for (int y = 1; y < 9; y += 2) {
+			World.push_back(new Blocks(BRICK, Vector3(generateX, -y, 1), 2, 2, 2));
+			World.push_back(new Blocks(BRICK, Vector3(generateX, -y, -1), 2, 2, 2));
+		}
+	}
+
+	World.push_back(new Blocks(BRICK, Vector3(6, 10, 1), 2, 2, 2));
+
+	for (int i = -24; i < 0; i += 2) {
+		for (int y = 1; y < 9; y += 2) {
+			World.push_back(new Blocks(BRICK, Vector3(i, -y, 1), 2, 2, 2));
+			World.push_back(new Blocks(BRICK, Vector3(i, -y, -1), 2, 2, 2));
+		}
+	}
 }
 
 void Assignment2::ResetAnimation()

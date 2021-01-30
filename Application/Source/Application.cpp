@@ -11,7 +11,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "Camera3.h"
+#include "SceneUI.h"
 #include "Assignment2.h"
+#include "Assignment.h"
+
+SCENE Application::sceneType;
+unsigned Application::m_width;
+unsigned Application::m_height;
 
 GLFWwindow* m_window;
 const unsigned char FPS = 60; // FPS of this game
@@ -56,9 +62,13 @@ Application::~Application()
 {
 }
 
-void resize_callback(GLFWwindow* window, int w, int h) {
-	glViewport(0, 0, w, h); // update opengl the new window size	
+void resize_callback(GLFWwindow* window, int w, int h)
+{
+	Application::m_width = w;
+	Application::m_height = h;
+	glViewport(0, 0, w, h);
 }
+
 
 bool Application::GetMouseUpdate()
 {
@@ -91,8 +101,28 @@ bool Application::GetMouseUpdate()
 	return false;
 }
 
+bool Application::IsMousePressed(unsigned short key) {
+	return glfwGetMouseButton(m_window, key) != 0;
+}
+
+void Application::GetCursorPos(double* xpos, double* ypos)
+{
+	glfwGetCursorPos(m_window, xpos, ypos);
+}
+
+int Application::GetWindowWidth()
+{
+	return m_width;
+}
+
+int Application::GetWindowHeight()
+{
+	return m_height;
+}
+
 void Application::Init()
 {
+	sceneType = UI;
 	//Set the error callback
 	glfwSetErrorCallback(error_callback);
 
@@ -109,11 +139,11 @@ void Application::Init()
 	//glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // To make MacOS happy; should not be needed
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); //We don't want the old OpenGL 
 
-
-	//Create a window and create its OpenGL context
-	m_window = glfwCreateWindow(800, 600, "Test Window", NULL, NULL);
+	m_width = 800;
+	m_height = 600;
+	m_window = glfwCreateWindow(m_width, m_height, "Test Window", NULL, NULL);
 	glfwSetWindowSizeCallback(m_window, resize_callback);
-	glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	// glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 	//If the window couldn't be created
 	if (!m_window)
@@ -144,13 +174,32 @@ void Application::Init()
 void Application::Run()
 {
 	//Main Loop
-	Scene *scene = new Assignment2();
-	scene->Init();
+	Scene* scene1 = new SceneUI();
+	Scene* scene2 = new Assignment2();
+	Scene* scene = scene1;
+
+	scene1->Init();
+	scene2->Init();
 
 	m_timer.startTimer();    // Start timer to calculate how long it takes to render this frame
 	while (!glfwWindowShouldClose(m_window) && !IsKeyPressed(VK_ESCAPE))
 	{
-		GetMouseUpdate();
+
+		switch (sceneType) {
+		case UI:
+			scene = scene1;
+			break;
+		case GAME:
+			scene = scene2;
+			break;
+		}
+
+		if (IsKeyPressed(VK_F1))
+			sceneType = UI;
+		else if (IsKeyPressed(VK_F2))
+			sceneType = GAME;
+
+		// GetMouseUpdate();
 		scene->Update(m_timer.getElapsedTime());
 		scene->Render();
 		//Swap buffers
@@ -160,8 +209,10 @@ void Application::Run()
         m_timer.waitUntil(frameTime);       // Frame rate limiter. Limits each frame to a specified time in ms.   
 
 	} //Check if the ESC key had been pressed or if the window had been closed
-	scene->Exit();
-	delete scene;
+	scene1->Exit();
+	scene2->Exit();
+	delete scene1;
+	delete scene2;
 }
 
 void Application::Exit()

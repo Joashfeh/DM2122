@@ -10,8 +10,7 @@ enum ENTITY_TYPE {
 class Entities {
 public:
 	ENTITY_TYPE type;
-
-	Position position;
+	Vector3 position;
 	float   xSize;
 	float   ySize;
 	float   zSize;

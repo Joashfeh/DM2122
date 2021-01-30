@@ -89,6 +89,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)\glew\include;$(SolutionDir)\glfw\include;$(SolutionDir)\Common\Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -174,6 +175,7 @@
     <ClCompile Include="Source\SceneSkybox.cpp" />
     <ClCompile Include="Source\SceneText.cpp" />
     <ClCompile Include="Source\SceneTexture.cpp" />
+    <ClCompile Include="Source\SceneUI.cpp" />
     <ClCompile Include="Source\shader.cpp" />
     <ClCompile Include="Source\UpdateHandler.cpp" />
     <ClCompile Include="Source\Utility.cpp" />
@@ -209,6 +211,7 @@
     <ClInclude Include="Source\SceneSkybox.h" />
     <ClInclude Include="Source\SceneText.h" />
     <ClInclude Include="Source\SceneTexture.h" />
+    <ClInclude Include="Source\SceneUI.h" />
     <ClInclude Include="Source\shader.hpp" />
     <ClInclude Include="Source\UpdateHandler.h" />
     <ClInclude Include="Source\Utility.h" />

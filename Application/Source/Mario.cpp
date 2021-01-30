@@ -1,4 +1,5 @@
 #include "Mario.h"
+#include "Blocks.h"
 
 Mario::Mario() {
     Init();
@@ -8,7 +9,10 @@ Mario::~Mario() {
 }
 
 void Mario::Init() {
-    this->position.Set(0, 50, 0);
+    this->velocity.Set(0, 0, 0);
+    this->position.Set(-15, 10, 0);
+    this->velocityGoal = 0;
+
     xSize = 0.8f;
     ySize = 3.4f;
     zSize = 1.f;
@@ -40,15 +44,24 @@ bool Mario::Collision(Entities& entity) {
 
             if (displacementX > 0)
                 this->position.x -= (xSize / 2 + entity.xSize / 2) - displacementX;
+                
         }
         else {
-            if (displacementY < 0) {
-                this->position.y += (ySize / 2 + entity.ySize / 2) + displacementY;
-                grounded = true;
-            }
 
-            if (displacementY > 0)
-                this->position.y -= (ySize / 2 + entity.ySize / 2) - displacementY;
+            if (abs(displacementY) - (double)(ySize / 2.f + entity.ySize / 2.f) < 0.001) {
+
+                if (displacementY < 0) {
+                    this->position.y += (ySize / 2 + entity.ySize / 2) + displacementY;
+                    grounded = true;
+                }
+
+                if (displacementY > 0) {
+                    this->position.y -= (ySize / 2 + entity.ySize / 2) - displacementY;
+                    this->velocity.y = -0.3;
+                    if (((Blocks*)&entity)->blockType == BRICK)
+                        delete& entity;
+                }
+            }
         }
     }
     else

@@ -163,6 +163,8 @@ private:
 	void ModelJump(double dt);
 	void ModelScale(double dt);
 
+	void Generate1_1();
+
 	void ResetAnimation();
 
 };

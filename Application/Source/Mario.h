@@ -2,6 +2,9 @@
 #include "Entities.h"
 class Mario : public Entities {
 public:
+	Vector3 velocity;
+	float velocityGoal;
+
 	bool grounded;
 	bool leftWallContact;
 	bool rightWallContact;

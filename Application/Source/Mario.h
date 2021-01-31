@@ -5,9 +5,8 @@ public:
 	Vector3 velocity;
 	float velocityGoal;
 
+	bool kill;
 	bool grounded;
-	bool leftWallContact;
-	bool rightWallContact;
 
 	Mario();
 	~Mario();

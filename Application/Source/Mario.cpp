@@ -1,5 +1,6 @@
 #include "Mario.h"
 #include "Blocks.h"
+#include "Goomba.h"
 
 Mario::Mario() {
     Init();
@@ -9,6 +10,8 @@ Mario::~Mario() {
 }
 
 void Mario::Init() {
+    kill = false;
+
     this->velocity.Set(0, 0, 0);
     this->position.Set(-15, 10, 0);
     this->velocityGoal = 0;
@@ -40,7 +43,7 @@ bool Mario::Collision(Entities& entity) {
 
         if (abs(displacementX) > abs(displacementY)) {
             if (displacementX < 0)
-                this->position.x += (xSize / 2 + entity.xSize / 2) + displacementX;
+                this->position.x += (xSize / 2 + entity.xSize / 2) + displacementX; 
 
             if (displacementX > 0)
                 this->position.x -= (xSize / 2 + entity.xSize / 2) - displacementX;
@@ -53,6 +56,13 @@ bool Mario::Collision(Entities& entity) {
                 if (displacementY < 0) {
                     this->position.y += (ySize / 2 + entity.ySize / 2) + displacementY;
                     grounded = true;
+                    kill = false;
+
+                    if (entity.type == GOOMBA) {
+                        kill = true;
+                        delete& entity;
+                    }
+
                 }
 
                 if (displacementY > 0) {

@@ -10,6 +10,7 @@
 #include "LoadTextData.h"
 #include <sstream>
 #include "Blocks.h"
+#include "Goomba.h"
 
 Mario Assignment2::player;
 
@@ -23,6 +24,44 @@ Assignment2::~Assignment2()
 
 void Assignment2::Init()
 {
+	// Variable Initialisation
+	{
+		player.position.Set(-15, 10, 0);
+
+		bodyDirectionAngle = 90;
+		bodySize = 0.5;
+		bodyAngle = 0;
+		headAngle = 0;
+
+		frames = 0;
+		// Right Arm
+		rightShoulderAngle = 0;
+		leftShoulderAngle = 0;
+
+		// Left Arm
+		rightElbowAngle = 0;
+		leftElbowAngle = 0;
+
+		// Right Leg
+		rightHipAngle = 0;
+		leftHipAngle = 0;
+
+		// Left Leg
+		rightKneeAngle = 0;
+		leftKneeAngle = 0;
+
+		running = false;
+		jump = false;
+		scaling = false;
+
+		time = 0;
+		translateX = 0;
+		translateY = 0;
+		translateZ = 0;
+
+		toggleLight = true;
+	}
+
 	glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
@@ -73,7 +112,7 @@ void Assignment2::Init()
 	);
 
 	light[0].type = Light::LIGHT_DIRECTIONAL;
-	light[0].position.Set(0, 50, 30);
+	light[0].position.Set(0, 1000, 1000);
 	light[0].color.Set(0.8, 0.8, 0.8);
 	light[0].power = 1.0f;
 	light[0].kC = 1.f;
@@ -99,8 +138,6 @@ void Assignment2::Init()
 	meshList[GEO_QUAD] = MeshBuilder::GenerateQuad("quad", Color(1, 1, 1), 1.f);
 	meshList[GEO_AXES] = MeshBuilder::GenerateAxes("Axes", 1000, 1000, 1000);
 	meshList[GEO_LIGHTBALL] = MeshBuilder::GenerateSphere("Light ball", Color(1, 1, 1), 16, 16);
-	meshList[GEO_SPHERE] = MeshBuilder::GenerateSphere("Sphere", Color(1, 1, 1), 48, 48);
-	meshList[GEO_SPHERE]->textureID = LoadTGA("Image//color.tga");
 
 	meshList[GEO_SPHERE] = MeshBuilder::GenerateSphere("Overall", Color(1, 1, 1), 48, 48);
 	meshList[GEO_SPHERE]->material.kShininess = 1.f;
@@ -136,27 +173,6 @@ void Assignment2::Init()
 	meshList[GEO_TOP]->textureID = LoadTGA("Image//top.tga");
 	meshList[GEO_BOTTOM]->textureID = LoadTGA("Image//bottom.tga");
 
-	meshList[GEO_BLOB] = MeshBuilder::GenerateQuad("blob", Color(1, 1, 1), 1.f);
-	meshList[GEO_BLOB]->textureID = LoadTGA("Image//ablobwhee.tga");
-
-	meshList[GEO_MODEL1] = MeshBuilder::GenerateOBJ("model1", "OBJ//chair.obj");
-	meshList[GEO_MODEL1]->textureID = LoadTGA("Image//chair.tga");
-
-	meshList[GEO_MODEL2] = MeshBuilder::GenerateOBJ("model1", "OBJ//dart.obj");
-	meshList[GEO_MODEL2]->textureID = LoadTGA("Image//dart.tga");
-
-	meshList[GEO_MODEL3] = MeshBuilder::GenerateOBJ("model1", "OBJ//dartboard.obj");
-	meshList[GEO_MODEL3]->textureID = LoadTGA("Image//dartboard.tga");
-
-	meshList[GEO_MODEL4] = MeshBuilder::GenerateOBJ("model1", "OBJ//doorman.obj");
-	meshList[GEO_MODEL4]->textureID = LoadTGA("Image//doorman.tga");
-
-	meshList[GEO_MODEL5] = MeshBuilder::GenerateOBJ("model1", "OBJ//shoe.obj");
-	meshList[GEO_MODEL5]->textureID = LoadTGA("Image//shoe.tga");
-
-	meshList[GEO_MODEL6] = MeshBuilder::GenerateOBJ("model1", "OBJ//winebottle.obj");
-	meshList[GEO_MODEL6]->textureID = LoadTGA("Image//winebottle.tga");
-
 	meshList[GEO_BRICK] = MeshBuilder::GenerateOBJMTL("brick", "OBJ//Brick.obj", "OBJ//Brick.mtl");
 
 	meshList[GEO_CIRCLE] = MeshBuilder::GenerateCircle("Circle", Color(1, 1, 1), 48);
@@ -165,45 +181,13 @@ void Assignment2::Init()
 	meshList[GEO_TEXT] = MeshBuilder::GenerateText("text", 16, 16);
 	meshList[GEO_TEXT]->textureID = LoadTGA("Image//Arial.tga");
 
-	player.position.Set(-15, 10, 0);
+	meshList[GEO_GOOMBA] = MeshBuilder::GenerateOBJMTL("goomba", "OBJ//goomba.obj", "OBJ//goomba.mtl");
+	meshList[GEO_GOOMBA]->textureID = LoadTGA("Image//goomba.tga");
 
 	Mtx44 projection;
 	projection.SetToPerspective(45.f, 4.f / 3.f, 0.1f, 1000.f);
 	projectionStack.LoadMatrix(projection);
 	camera.Init(Vector3(0, player.position.y + 2.4, -15), Vector3(0, player.position.y + 2.4, 0), Vector3(0, 1, 0));
-
-	bodyDirectionAngle = 90;
-	bodySize = 0.5;
-	bodyAngle = 0;
-	headAngle = 0;
-
-	frames = 0;
-	// Right Arm
-	rightShoulderAngle = 0;
-	leftShoulderAngle = 0;
-
-	// Left Arm
-	rightElbowAngle = 0;
-	leftElbowAngle = 0;
-
-	// Right Leg
-	rightHipAngle = 0;
-	leftHipAngle = 0;
-
-	// Left Leg
-	rightKneeAngle = 0;
-	leftKneeAngle = 0;
-
-	running = false;
-	jump = false;
-	scaling = false;
-
-	time = 0;
-	translateX = 0;
-	translateY = 0;
-	translateZ = 0;
-
-	toggleLight = true;
 
 	// Generate default VAO
 	glGenVertexArrays(1, &m_vertexArrayID);
@@ -237,16 +221,18 @@ void Assignment2::Init()
            
 void Assignment2::Update(double dt) {
 
+	light[1].position.Set(camera.position.x, 50, 30);
+
 	if (player.position.y < -20) {
 		player.Init();
 		camera.Reset();
+		Generate1_1();
 	}
-
-	UpdateHandler(bodyDirectionAngle, jump, dt);
-	player.grounded = false;
 
 	if (player.position.x < camera.position.x - 20)
 		player.position.x = camera.position.x - 20;
+
+	UpdateHandler(bodyDirectionAngle, jump, dt);
 
 	for (int i = 0; i < World.size(); ++i)
 		player.Collision(*World[i]);
@@ -312,7 +298,7 @@ void Assignment2::Update(double dt) {
 		{
 			running = true;
 		}
-		else if (Application::IsKeyReleased('W') && Application::IsKeyReleased('S') && Application::IsKeyReleased('A') && Application::IsKeyReleased('D'))
+		else if (Application::IsKeyReleased('A') && Application::IsKeyReleased('D'))
 			running = false;
 	}
 
@@ -344,6 +330,7 @@ void Assignment2::Update(double dt) {
 	if (Application::IsKeyPressed('R')) {
 		player.Init();
 		camera.Reset();
+		Generate1_1();
 	}
 		
 }
@@ -384,6 +371,12 @@ void Assignment2::Render() {
 	//RenderFloor();
 	//RenderMesh(meshList[GEO_AXES], false);
 
+	/*modelStack.PushMatrix();
+	modelStack.Translate(0, 1.3, 0);
+	modelStack.Rotate(-90, 0, 1 ,0);
+	modelStack.Scale(0.5, 0.5, 0.5);
+	RenderMesh(meshList[GEO_GOOMBA], toggleLight);
+	modelStack.PopMatrix();*/
 
 	modelStack.PushMatrix();
 	modelStack.Translate(light[0].position.x, light[0].position.y, light[0].position.z);
@@ -456,6 +449,53 @@ void Assignment2::RenderMesh(Mesh* mesh, bool enableLight)
 
 }
 
+void Assignment2::RenderTextOnScreen(Mesh* mesh, std::string text, Color color, float size, float x, float y)
+{
+	LoadTextData(textWidthData, "TextData//ArialFontData.csv");
+	if (!mesh || mesh->textureID <= 0) //Proper error check
+		return;
+	glDisable(GL_DEPTH_TEST);
+
+	Mtx44 ortho;
+	ortho.SetToOrtho(0, 80, 0, 60, -10, 10); //size of screen UI
+	projectionStack.PushMatrix();
+	projectionStack.LoadMatrix(ortho);
+	viewStack.PushMatrix();
+	viewStack.LoadIdentity(); //No need camera for ortho mode
+	modelStack.PushMatrix();
+	modelStack.LoadIdentity(); //Reset modelStack
+	modelStack.Translate(x, y, 0);
+	modelStack.Scale(size, size, size);
+
+	glUniform1i(m_parameters[U_TEXT_ENABLED], 1);
+	glUniform3fv(m_parameters[U_TEXT_COLOR], 1, &color.r);
+	glUniform1i(m_parameters[U_LIGHTENABLED], 0);
+	glUniform1i(m_parameters[U_COLOR_TEXTURE_ENABLED], 1);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, mesh->textureID);
+	glUniform1i(m_parameters[U_COLOR_TEXTURE], 0);
+
+	float accumulator = 0;
+	for (unsigned i = 0; i < text.length(); ++i)
+	{
+		Mtx44 characterSpacing;
+		characterSpacing.SetToTranslation(0.5f + accumulator, 0.5f, 0);
+		Mtx44 MVP = projectionStack.Top() * viewStack.Top() * modelStack.Top() * characterSpacing;
+		glUniformMatrix4fv(m_parameters[U_MVP], 1, GL_FALSE, &MVP.a[0]);
+		mesh->Render((unsigned)text[i] * 6, 6);
+
+		accumulator += textWidthData[text[i]] / 64.0f;
+	}
+
+	projectionStack.PopMatrix();
+	viewStack.PopMatrix();
+	modelStack.PopMatrix();
+
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glUniform1i(m_parameters[U_TEXT_ENABLED], 0);
+	glEnable(GL_DEPTH_TEST);
+}
+
 void Assignment2::RenderSkybox()
 {
 
@@ -508,7 +548,6 @@ void Assignment2::RenderSkybox()
 	modelStack.PopMatrix();
 }
 
-
 void Assignment2::RenderFloor() {
 	modelStack.PushMatrix();
 	modelStack.Rotate(-90, 1, 0, 0);
@@ -516,7 +555,6 @@ void Assignment2::RenderFloor() {
 	RenderMesh(meshList[GEO_FLOOR], toggleLight);
 	modelStack.PopMatrix();
 }
-
 
 void Assignment2::RenderMario() {
 
@@ -1498,19 +1536,37 @@ void Assignment2::RenderHead() {
 
 void Assignment2::RenderBlocks() {
 	for (int i = 0; i < World.size(); ++i) {
-		modelStack.PushMatrix();
-		modelStack.Translate(World[i]->position.x, World[i]->position.y, World[i]->position.z);
-		modelStack.Scale(1.1, 1.1, 1.1);
 
-		switch (((Blocks*)World[i])->blockType) {
-		case BARRIER:
+		switch (World[i]->type) {
+		case BLOCK:
+
+			modelStack.PushMatrix();
+			modelStack.Translate(World[i]->position.x, World[i]->position.y, World[i]->position.z);
+			modelStack.Scale(1.1, 1.1, 1.1);
+
+			switch (((Blocks*)World[i])->blockType) {
+			case BARRIER:
+				break;
+			case BRICK:
+				RenderMesh(meshList[GEO_BRICK], toggleLight);
+				break;
+			case UNBREAKABLE:
+				RenderMesh(meshList[GEO_BRICK], toggleLight);
+				break;
+			}
+			modelStack.PopMatrix();
 			break;
-		case BRICK:
-			RenderMesh(meshList[GEO_BRICK], toggleLight);
+
+		case GOOMBA:
+			modelStack.PushMatrix();
+			modelStack.Translate(World[i]->position.x, World[i]->position.y + 0.3, World[i]->position.z);
+			modelStack.Rotate(-90, 0, 1, 0);
+			modelStack.Scale(0.5, 0.5, 0.5);
+			RenderMesh(meshList[GEO_GOOMBA], toggleLight);
+			modelStack.PopMatrix();
 			break;
 		}
 
-		modelStack.PopMatrix();
 	}
 
 }
@@ -1590,38 +1646,6 @@ void Assignment2::ModelScale(double dt)
 
 }
 
-void Assignment2::Generate1_1() {
-
-	int generateX = 0;
-
-	// first 69 blocks
-	for (int x = generateX; generateX < 138; generateX += 2) {
-		for (int y = 1; y < 9; y += 2) {
-			World.push_back(new Blocks(BRICK, Vector3(generateX, -y, 1), 2, 2, 2));
-			World.push_back(new Blocks(BRICK, Vector3(generateX, -y, -1), 2, 2, 2));
-		}
-	}
-
-	generateX += 8;
-
-	// after 2 empty spaces
-	for (int x = generateX; generateX - x < 30; generateX += 2) {
-		for (int y = 1; y < 9; y += 2) {
-			World.push_back(new Blocks(BRICK, Vector3(generateX, -y, 1), 2, 2, 2));
-			World.push_back(new Blocks(BRICK, Vector3(generateX, -y, -1), 2, 2, 2));
-		}
-	}
-
-	World.push_back(new Blocks(BRICK, Vector3(6, 10, 1), 2, 2, 2));
-
-	for (int i = -24; i < 0; i += 2) {
-		for (int y = 1; y < 9; y += 2) {
-			World.push_back(new Blocks(BRICK, Vector3(i, -y, 1), 2, 2, 2));
-			World.push_back(new Blocks(BRICK, Vector3(i, -y, -1), 2, 2, 2));
-		}
-	}
-}
-
 void Assignment2::ResetAnimation()
 {
 	bodyAngle = 0;
@@ -1644,51 +1668,39 @@ void Assignment2::ResetAnimation()
 	leftKneeAngle = 0;
 }
 
+void Assignment2::Generate1_1() {
 
-void Assignment2::RenderTextOnScreen(Mesh* mesh, std::string text, Color color, float size, float x, float y)
-{
-	LoadTextData(textWidthData, "TextData//ArialFontData.csv");
-	if (!mesh || mesh->textureID <= 0) //Proper error check
-		return;
-	glDisable(GL_DEPTH_TEST);
+	World.clear();
 
-	Mtx44 ortho;
-	ortho.SetToOrtho(0, 80, 0, 60, -10, 10); //size of screen UI
-	projectionStack.PushMatrix();
-	projectionStack.LoadMatrix(ortho);
-	viewStack.PushMatrix();
-	viewStack.LoadIdentity(); //No need camera for ortho mode
-	modelStack.PushMatrix();
-	modelStack.LoadIdentity(); //Reset modelStack
-	modelStack.Translate(x, y, 0);
-	modelStack.Scale(size, size, size);
+	int generateX = 0;
 
-	glUniform1i(m_parameters[U_TEXT_ENABLED], 1);
-	glUniform3fv(m_parameters[U_TEXT_COLOR], 1, &color.r);
-	glUniform1i(m_parameters[U_LIGHTENABLED], 0);
-	glUniform1i(m_parameters[U_COLOR_TEXTURE_ENABLED], 1);
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, mesh->textureID);
-	glUniform1i(m_parameters[U_COLOR_TEXTURE], 0);
-
-	float accumulator = 0;
-	for (unsigned i = 0; i < text.length(); ++i)
-	{
-		Mtx44 characterSpacing;
-		characterSpacing.SetToTranslation(0.5f + accumulator, 0.5f, 0);
-		Mtx44 MVP = projectionStack.Top() * viewStack.Top() * modelStack.Top() * characterSpacing;
-		glUniformMatrix4fv(m_parameters[U_MVP], 1, GL_FALSE, &MVP.a[0]);
-		mesh->Render((unsigned)text[i] * 6, 6);
-
-		accumulator += textWidthData[text[i]] / 64.0f;
+	// first 69 blocks
+	for (int x = generateX; generateX < 138; generateX += 2) {
+		for (int y = 1; y < 9; y += 2) {
+			World.push_back(new Blocks(UNBREAKABLE, Vector3(generateX, -y, 1), 2, 2, 2));
+			World.push_back(new Blocks(UNBREAKABLE, Vector3(generateX, -y, -1), 2, 2, 2));
+		}
 	}
 
-	projectionStack.PopMatrix();
-	viewStack.PopMatrix();
-	modelStack.PopMatrix();
+	generateX += 8;
 
-	glBindTexture(GL_TEXTURE_2D, 0);
-	glUniform1i(m_parameters[U_TEXT_ENABLED], 0);
-	glEnable(GL_DEPTH_TEST);
+	// after 2 empty spaces
+	for (int x = generateX; generateX - x < 30; generateX += 2) {
+		for (int y = 1; y < 9; y += 2) {
+			World.push_back(new Blocks(UNBREAKABLE, Vector3(generateX, -y, 1), 2, 2, 2));
+			World.push_back(new Blocks(UNBREAKABLE, Vector3(generateX, -y, -1), 2, 2, 2));
+		}
+	}
+
+	World.push_back(new Blocks(BRICK, Vector3(6, 10, 1), 2, 2, 2));
+
+	for (int i = -24; i < 0; i += 2) {
+		for (int y = 1; y < 9; y += 2) {
+			World.push_back(new Blocks(UNBREAKABLE, Vector3(i, -y, 1), 2, 2, 2));
+			World.push_back(new Blocks(UNBREAKABLE, Vector3(i, -y, -1), 2, 2, 2));
+		}
+	}
+
+	World.push_back(new Goomba(Vector3(10, 1, 0)));
+
 }
-

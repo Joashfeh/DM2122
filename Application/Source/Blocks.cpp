@@ -7,6 +7,7 @@ Blocks::~Blocks() {
 }
 
 Blocks::Blocks(BLOCK_TYPE type, Vector3 pos, float xSize, float ySize, float zSize) {
+	this->type = BLOCK;
 	blockType = type;
 	position = pos;
 

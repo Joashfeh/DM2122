@@ -10,6 +10,8 @@ void UpdateHandler(float& bodyAngle, bool& jump, double dt) {
 	Assignment2::player.position += Assignment2::player.velocity;
 	MovementHandler(bodyAngle, dt);
 	JumpHandler(jump, dt);
+
+	Assignment2::player.grounded = false;
 }
 
 // Movement
@@ -53,9 +55,20 @@ void JumpHandler(bool& jump, double dt) {
 		jump = false;
 
 		if (Application::IsKeyPressed(VK_SPACE)) {
-			Assignment2::player.velocity.y += 9.81 * dt * lowJumpMultiplier;
+			Assignment2::player.velocity.y = 9.81 * dt * lowJumpMultiplier;
 			stoppedJumping = false;
 			jump = true;
+
+		}
+	}
+
+	if (Assignment2::player.kill) {
+		jump = true;
+		stoppedJumping = true;
+
+		if (jumpTimeCounter > 0) {
+			Assignment2::player.velocity.y += 9.81 * dt * 1.5f;
+			jumpTimeCounter -= dt;
 		}
 	}
 

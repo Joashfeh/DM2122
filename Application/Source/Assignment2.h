@@ -80,6 +80,7 @@ class Assignment2 : public Scene {
 		GEO_MODEL5,
 		GEO_MODEL6,
 		GEO_BRICK,
+		GEO_GOOMBA,
 		GEO_FLOOR,
 		GEO_TEXT,
 		NUM_GEOMETRY,
@@ -164,7 +165,6 @@ private:
 	void ModelScale(double dt);
 
 	void Generate1_1();
-
 	void ResetAnimation();
 
 };

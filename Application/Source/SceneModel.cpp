@@ -107,33 +107,6 @@ void SceneModel::Init()
 	meshList[GEO_LEFT]->textureID = LoadTGA("Image//left.tga");
 	meshList[GEO_TOP]->textureID = LoadTGA("Image//top.tga");
 	meshList[GEO_BOTTOM]->textureID = LoadTGA("Image//bottom.tga");
-
-	meshList[GEO_BLOB] = MeshBuilder::GenerateQuad("blob", Color(1, 1, 1), 1.f);
-	meshList[GEO_BLOB]->textureID = LoadTGA("Image//ablobwhee.tga");
-
-	meshList[GEO_MODEL1] = MeshBuilder::GenerateOBJ("model1", "OBJ//chair.obj");
-	meshList[GEO_MODEL1]->textureID = LoadTGA("Image//chair.tga");
-
-	meshList[GEO_MODEL2] = MeshBuilder::GenerateOBJ("model1", "OBJ//dart.obj");
-	meshList[GEO_MODEL2]->textureID = LoadTGA("Image//dart.tga");
-
-	meshList[GEO_MODEL3] = MeshBuilder::GenerateOBJ("model1", "OBJ//dartboard.obj");
-	meshList[GEO_MODEL3]->textureID = LoadTGA("Image//dartboard.tga");
-
-	meshList[GEO_MODEL4] = MeshBuilder::GenerateOBJ("model1", "OBJ//doorman.obj");
-	meshList[GEO_MODEL4]->textureID = LoadTGA("Image//doorman.tga");
-
-	meshList[GEO_MODEL5] = MeshBuilder::GenerateOBJ("model1", "OBJ//shoe.obj");
-	meshList[GEO_MODEL5]->textureID = LoadTGA("Image//shoe.tga");
-
-	meshList[GEO_MODEL6] = MeshBuilder::GenerateOBJ("model1", "OBJ//winebottle.obj");
-	meshList[GEO_MODEL6]->textureID = LoadTGA("Image//winebottle.tga");
-	meshList[GEO_BRICK] = MeshBuilder::GenerateOBJMTL("brick", "OBJ//Brick.obj", "OBJ//Brick.mtl");
-	meshList[GEO_MODEL7] = MeshBuilder::GenerateOBJMTL("model7", "OBJ//house_type01.obj", "OBJ//house_type01.mtl");
-
-	meshList[GEO_MODEL8] = MeshBuilder::GenerateOBJMTL("model8", "OBJ//cottage_obj.obj", "OBJ//cottage_obj.mtl");
-	meshList[GEO_MODEL8]->textureID = LoadTGA("Image//cottage_diffuse.tga");
-
 	
 
 	meshList[GEO_FLOOR] = MeshBuilder::GenerateQuad("Floor", Color(1, 1, 1), 1.f);

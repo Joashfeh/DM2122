@@ -52,12 +52,10 @@ bool Mario::Collision(Entities& entity) {
         if (abs(displacementX) > abs(displacementY)) {
             if (displacementX < 0) {
                 this->position.x += (xSize / 2 + entity.xSize / 2) + displacementX;
-                this->velocity.x = 0;
             }
 
             if (displacementX > 0) {
                 this->position.x -= (xSize / 2 + entity.xSize / 2) - displacementX;
-                this->velocity.x = 0;
             }
                 
             if (entity.type == GOOMBA)

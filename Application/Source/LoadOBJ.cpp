@@ -283,6 +283,8 @@ bool LoadOBJMTL(
 		else if (strncmp("usemtl ", buf, 7) == 0) { //process usemtl
 			char mtl_name[256];
 			strcpy_s(mtl_name, buf + 7);
+			if (mtl_name[strlen(mtl_name) - 1] == '\r')
+				mtl_name[strlen(mtl_name) - 1] = '\0';
 			if (materials_map.find(mtl_name) != materials_map.end())
 			{
 				Material* mtl = materials_map.find(mtl_name)->second;

@@ -1,6 +1,7 @@
 #include "Mario.h"
 #include "Blocks.h"
 #include "Goomba.h"
+#include "Assignment2.h"
 
 Mario::Mario() {
     Init();
@@ -10,6 +11,8 @@ Mario::~Mario() {
 }
 
 void Mario::Init() {
+    superStar = false;
+    dead = false;
     kill = false;
 
     this->velocity.Set(0, 0, 0);
@@ -37,23 +40,35 @@ bool AABB(Entities& a, Entities& b) {
 
 bool Mario::Collision(Entities& entity) {
     if (AABB(*this, entity)) {
-
+            
+        if (((Blocks*)&entity)->blockType == STAR) {
+            superStar = true;
+            delete& entity;
+        }
+        
         float displacementX = entity.position.x - this->position.x;
         float displacementY = entity.position.y - this->position.y;
 
         if (abs(displacementX) > abs(displacementY)) {
-            if (displacementX < 0)
-                this->position.x += (xSize / 2 + entity.xSize / 2) + displacementX; 
+            if (displacementX < 0) {
+                this->position.x += (xSize / 2 + entity.xSize / 2) + displacementX;
+                this->velocity.x = 0;
+            }
 
-            if (displacementX > 0)
+            if (displacementX > 0) {
                 this->position.x -= (xSize / 2 + entity.xSize / 2) - displacementX;
+                this->velocity.x = 0;
+            }
                 
+            if (entity.type == GOOMBA)
+                dead = true;
+
         }
         else {
 
             if (abs(displacementY) - (double)(ySize / 2.f + entity.ySize / 2.f) < 0.001) {
 
-                if (displacementY < 0) {
+                if (displacementY < 0 && velocity.y < 0) {
                     this->position.y += (ySize / 2 + entity.ySize / 2) + displacementY;
                     grounded = true;
                     kill = false;
@@ -65,11 +80,19 @@ bool Mario::Collision(Entities& entity) {
 
                 }
 
-                if (displacementY > 0) {
+                if (displacementY > 0 && velocity.y > 0) {
+
                     this->position.y -= (ySize / 2 + entity.ySize / 2) - displacementY;
-                    this->velocity.y = -0.3;
-                    if (((Blocks*)&entity)->blockType == BRICK)
+
+                    if (((Blocks*)&entity)->blockType == BRICK && velocity.y > 0)
                         delete& entity;
+
+                    if (((Blocks*)&entity)->blockType == QUESTION_BLOCK && velocity.y > 0) {
+                        ((Blocks*)&entity)->blockType = UNBREAKABLE;
+                        Assignment2::World.push_back(new Blocks(STAR, Vector3(((Blocks*)&entity)->position.x, ((Blocks*)&entity)->position.y + 2.3, 1), 1, 1, 1));
+                    }
+          
+                    this->velocity.y = -0.3;
                 }
             }
         }

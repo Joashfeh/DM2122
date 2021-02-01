@@ -13,6 +13,7 @@
 #include "Goomba.h"
 
 Mario Assignment2::player;
+std::vector<Entities*> Assignment2::World;
 
 Assignment2::Assignment2()
 {
@@ -184,6 +185,8 @@ void Assignment2::Init()
 	meshList[GEO_GOOMBA] = MeshBuilder::GenerateOBJMTL("goomba", "OBJ//goomba.obj", "OBJ//goomba.mtl");
 	meshList[GEO_GOOMBA]->textureID = LoadTGA("Image//goomba.tga");
 
+	meshList[GEO_STAR] = MeshBuilder::GenerateOBJMTL("MarioStar", "OBJ//star.obj", "OBJ//star.mtl");
+
 	Mtx44 projection;
 	projection.SetToPerspective(45.f, 4.f / 3.f, 0.1f, 1000.f);
 	projectionStack.LoadMatrix(projection);
@@ -223,10 +226,9 @@ void Assignment2::Update(double dt) {
 
 	light[1].position.Set(camera.position.x, 50, 30);
 
-	if (player.position.y < -20) {
-		player.Init();
-		camera.Reset();
-		Generate1_1();
+	if (player.dead) {
+		ResetGame();
+		player.dead = false;
 	}
 
 	if (player.position.x < camera.position.x - 20)
@@ -236,6 +238,8 @@ void Assignment2::Update(double dt) {
 
 	for (int i = 0; i < World.size(); ++i)
 		player.Collision(*World[i]);
+
+	UpdateStarAnimation(dt);
 
 	camera.Update(dt);
 
@@ -368,6 +372,13 @@ void Assignment2::Render() {
 	RenderSkybox();
 	RenderMario();
 	RenderBlocks();
+
+	//modelStack.PushMatrix();
+	//modelStack.Translate(8, 12, 1);
+	//modelStack.Scale(0.8, 0.8, 0.8);
+	//RenderMesh(meshList[GEO_STAR], toggleLight);
+	//modelStack.PopMatrix();
+
 	//RenderFloor();
 	//RenderMesh(meshList[GEO_AXES], false);
 
@@ -1534,6 +1545,111 @@ void Assignment2::RenderHead() {
 	modelStack.PopMatrix();
 }
 
+void Assignment2::RenderQuestionMark() {
+	{
+		modelStack.PushMatrix();
+		modelStack.Scale(1, 1, 0.4);
+
+		{
+			modelStack.PushMatrix();
+			modelStack.Translate(0, 3, 0);
+
+			{
+				modelStack.PushMatrix();
+				modelStack.Translate(0.5, 1.5, 0);
+				modelStack.Scale(0.5, 0.5, 1);
+
+				{
+					modelStack.PushMatrix();
+					modelStack.Translate(3, 3, 0);
+					modelStack.Scale(2, 4, 1);
+					meshList[GEO_CUBE]->material.kAmbient.Set(0.6f, 0.6f, 0.6f);
+					meshList[GEO_CUBE]->material.kDiffuse.Set(0.9f, 0.9f, 0.9f);
+					meshList[GEO_CUBE]->material.kSpecular.Set(0.6f, 0.6f, 0.6f);
+					RenderMesh(meshList[GEO_CUBE], true);
+					modelStack.PopMatrix();
+				}
+
+				{
+					modelStack.PushMatrix();
+					modelStack.Translate(-2, 8, 0);
+
+					{
+						modelStack.PushMatrix();
+						modelStack.Translate(-5, -4, 0);
+						modelStack.Scale(2, 3, 1);
+						meshList[GEO_CUBE]->material.kAmbient.Set(0.6f, 0.6f, 0.6f);
+						meshList[GEO_CUBE]->material.kDiffuse.Set(0.9f, 0.9f, 0.9f);
+						meshList[GEO_CUBE]->material.kSpecular.Set(0.6f, 0.6f, 0.6f);
+						RenderMesh(meshList[GEO_CUBE], true);
+						modelStack.PopMatrix();
+					}
+
+					modelStack.Scale(5, 1, 1);
+					meshList[GEO_CUBE]->material.kAmbient.Set(0.6f, 0.6f, 0.6f);
+					meshList[GEO_CUBE]->material.kDiffuse.Set(0.9f, 0.9f, 0.9f);
+					meshList[GEO_CUBE]->material.kSpecular.Set(0.6f, 0.6f, 0.6f);
+					RenderMesh(meshList[GEO_CUBE], true);
+					modelStack.PopMatrix();
+				}
+
+				meshList[GEO_CUBE]->material.kAmbient.Set(0.6f, 0.6f, 0.6f);
+				meshList[GEO_CUBE]->material.kDiffuse.Set(0.9f, 0.9f, 0.9f);
+				meshList[GEO_CUBE]->material.kSpecular.Set(0.6f, 0.6f, 0.6f);
+				RenderMesh(meshList[GEO_CUBE], true);
+				modelStack.PopMatrix();
+			}
+
+			meshList[GEO_CUBE]->material.kAmbient.Set(0.6f, 0.6f, 0.6f);
+			meshList[GEO_CUBE]->material.kDiffuse.Set(0.9f, 0.9f, 0.9f);
+			meshList[GEO_CUBE]->material.kSpecular.Set(0.6f, 0.6f, 0.6f);
+			RenderMesh(meshList[GEO_CUBE], true);
+			modelStack.PopMatrix();
+		}
+
+		meshList[GEO_CUBE]->material.kAmbient.Set(0.6f, 0.6f, 0.6f);
+		meshList[GEO_CUBE]->material.kDiffuse.Set(0.9f, 0.9f, 0.9f);
+		meshList[GEO_CUBE]->material.kSpecular.Set(0.6f, 0.6f, 0.6f);
+		RenderMesh(meshList[GEO_CUBE], true);
+		modelStack.PopMatrix();
+	}
+}
+
+void Assignment2::RenderQuestionBlock() {
+	modelStack.PushMatrix();
+	modelStack.Scale(0.18, 0.18, 0.18);
+
+	modelStack.PushMatrix();
+	modelStack.Translate(0.5, -4, 6);
+	RenderQuestionMark();
+	modelStack.PopMatrix();
+
+	modelStack.PushMatrix();
+	modelStack.Rotate(90, 0, 1, 0);
+	modelStack.Translate(0.5, -4, 6);
+	RenderQuestionMark();
+	modelStack.PopMatrix();
+
+	modelStack.PushMatrix();
+	modelStack.Rotate(180, 0, 1, 0);
+	modelStack.Translate(0.5, -4, 6);
+	RenderQuestionMark();
+	modelStack.PopMatrix();
+
+	modelStack.PushMatrix();
+	modelStack.Rotate(270, 0, 1, 0);
+	modelStack.Translate(0.5, -4, 6);
+	RenderQuestionMark();
+	modelStack.PopMatrix();
+
+	modelStack.Scale(6, 6, 6);
+	meshList[GEO_CUBE]->material.kAmbient.Set(.3f, 0.2529f, 0.0f);
+	meshList[GEO_CUBE]->material.kDiffuse.Set(0.9f, 0.7587f, 0.f);
+	meshList[GEO_CUBE]->material.kSpecular.Set(0.7f, 0.590f, 0.f);
+	RenderMesh(meshList[GEO_CUBE], true);
+	modelStack.PopMatrix();
+}
+
 void Assignment2::RenderBlocks() {
 	for (int i = 0; i < World.size(); ++i) {
 
@@ -1542,7 +1658,7 @@ void Assignment2::RenderBlocks() {
 
 			modelStack.PushMatrix();
 			modelStack.Translate(World[i]->position.x, World[i]->position.y, World[i]->position.z);
-			modelStack.Scale(1.1, 1.1, 1.1);
+			// modelStack.Scale(1.1, 1.1, 1.1);
 
 			switch (((Blocks*)World[i])->blockType) {
 			case BARRIER:
@@ -1553,6 +1669,14 @@ void Assignment2::RenderBlocks() {
 			case UNBREAKABLE:
 				RenderMesh(meshList[GEO_BRICK], toggleLight);
 				break;
+			case QUESTION_BLOCK:
+				// modelStack.Scale(1 / 1.1, 1 / 1.1, 1 / 1.1);
+				RenderQuestionBlock();
+				break;
+			case STAR:
+				modelStack.Rotate(((Blocks*)World[i])->starRotateAmount, 0, 1, 0);
+				modelStack.Scale(0.8, 0.8, 0.8);
+				RenderMesh(meshList[GEO_STAR], toggleLight);
 			}
 			modelStack.PopMatrix();
 			break;
@@ -1668,6 +1792,27 @@ void Assignment2::ResetAnimation()
 	leftKneeAngle = 0;
 }
 
+void Assignment2::UpdateStarAnimation(double dt) {
+	for (int i = 0; i < World.size(); ++i) {
+		if (((Blocks*)World[i])->blockType == STAR) {
+			((Blocks*)World[i])->starRotateAmount += dt * 60;
+			((Blocks*)World[i])->timeCounter += dt;
+
+			if (((Blocks*)World[i])->starRotateAmount > 360)
+				((Blocks*)World[i])->starRotateAmount = 0;
+
+			World[i]->position.y = 0.3 * sin(((Blocks*)World[i])->timeCounter) + ((Blocks*)World[i])->defaultPosition.y;
+		}
+	}
+}
+
+void Assignment2::ResetGame()
+{
+	player.Init();
+	camera.Reset();
+	Generate1_1();
+}
+
 void Assignment2::Generate1_1() {
 
 	World.clear();
@@ -1701,6 +1846,8 @@ void Assignment2::Generate1_1() {
 		}
 	}
 
+	World.push_back(new Blocks(QUESTION_BLOCK, Vector3(8, 10, 1), 2, 2, 2));
 	World.push_back(new Goomba(Vector3(10, 1, 0)));
 
 }
+

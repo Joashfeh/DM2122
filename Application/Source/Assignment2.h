@@ -73,14 +73,9 @@ class Assignment2 : public Scene {
 		GEO_FRONT,
 		GEO_BACK,
 		GEO_BLOB,
-		GEO_MODEL1,
-		GEO_MODEL2,
-		GEO_MODEL3,
-		GEO_MODEL4,
-		GEO_MODEL5,
-		GEO_MODEL6,
 		GEO_BRICK,
 		GEO_GOOMBA,
+		GEO_STAR,
 		GEO_FLOOR,
 		GEO_TEXT,
 		NUM_GEOMETRY,
@@ -88,7 +83,7 @@ class Assignment2 : public Scene {
 
 public:
 
-	std::vector<Entities*> World;
+	static std::vector<Entities*> World;
 	static Mario player;
 
 	Assignment2();
@@ -155,9 +150,8 @@ private:
 	void RenderLeftLeg();
 	void RenderHead();
 	void RenderMario();
-
-	void RenderFireFlower();
 	void RenderQuestionMark();
+	void RenderQuestionBlock();
 	void RenderBlocks();
 
 	void ModelRun(double dt);
@@ -165,7 +159,10 @@ private:
 	void ModelScale(double dt);
 
 	void Generate1_1();
+	void UpdateStarAnimation(double dt);
 	void ResetAnimation();
+
+	void ResetGame();
 
 };
 

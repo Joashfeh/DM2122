@@ -11,6 +11,10 @@ void UpdateHandler(float& bodyAngle, bool& jump, double dt) {
 	MovementHandler(bodyAngle, dt);
 	JumpHandler(jump, dt);
 
+	if (Assignment2::player.position.y < -20)
+		Assignment2::player.dead = true;
+		
+
 	Assignment2::player.grounded = false;
 }
 
@@ -67,7 +71,7 @@ void JumpHandler(bool& jump, double dt) {
 		stoppedJumping = true;
 
 		if (jumpTimeCounter > 0) {
-			Assignment2::player.velocity.y += 9.81 * dt * 1.5f;
+			Assignment2::player.velocity.y += 9.81 * dt * 1.f;
 			jumpTimeCounter -= dt;
 		}
 	}

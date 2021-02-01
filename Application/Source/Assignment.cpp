@@ -1746,7 +1746,7 @@ void Assignment::RenderBlocks() {
 	modelStack.Translate(0.5, -4, 6);
 	RenderQuestionMark();
 	modelStack.PopMatrix();
-
+	
 	modelStack.PushMatrix();
 	modelStack.Rotate(90, 0, 1, 0);
 	modelStack.Translate(0.5, -4, 6);

@@ -7,9 +7,11 @@ Blocks::~Blocks() {
 }
 
 Blocks::Blocks(BLOCK_TYPE type, Vector3 pos, float xSize, float ySize, float zSize) {
+	starRotateAmount = 0.f;
+	timeCounter = 0.f;
 	this->type = BLOCK;
 	blockType = type;
-	position = pos;
+	position = defaultPosition = pos;
 
 	this->xSize = xSize;
 	this->ySize = ySize;

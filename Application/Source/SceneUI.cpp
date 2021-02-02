@@ -88,11 +88,10 @@ void SceneUI::Init()
 	light[1].spotDirection.Set(2.f, 1.f, 0.f);
 
 	meshList[GEO_QUAD] = MeshBuilder::GenerateQuad("quad", Color(1, 1, 1), 1.f);
-	meshList[GEO_QUAD]->textureID = LoadTGA("Image//mario.tga");
+	meshList[GEO_QUAD]->textureID = LoadTGA("Image//SuperMrMario.tga");
 	meshList[GEO_AXES] = MeshBuilder::GenerateAxes("Axes", 1000, 1000, 1000);
 	meshList[GEO_LIGHTBALL] = MeshBuilder::GenerateSphere("Light ball", Color(1, 1, 1), 16, 16);
 	meshList[GEO_SPHERE] = MeshBuilder::GenerateSphere("Sphere", Color(1, 1, 1), 48, 48);
-	meshList[GEO_SPHERE]->textureID = LoadTGA("Image//color.tga");
 
 	meshList[GEO_FRONT] = MeshBuilder::GenerateQuad("front", Color(1, 1, 1), 1.f);
 	meshList[GEO_RIGHT] = MeshBuilder::GenerateQuad("right", Color(1, 1, 1), 1.f);
@@ -349,10 +348,10 @@ void SceneUI::Render() {
 
 	RenderTextOnScreen(meshList[GEO_TEXT], "play", playColor, 6, 32.5, 10);
 
-	std::stringstream ss;
+	/*std::stringstream ss;
 	ss.precision(4);
 	ss << "FPS: " << fps;
-	RenderTextOnScreen(meshList[GEO_TEXT], ss.str(), Color(0, 1, 0), 4, 0, 55);
+	RenderTextOnScreen(meshList[GEO_TEXT], ss.str(), Color(0, 1, 0), 4, 0, 55);*/
 
 }
 

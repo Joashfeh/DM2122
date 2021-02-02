@@ -12,6 +12,7 @@ Blocks::Blocks(BLOCK_TYPE type, Vector3 pos, float xSize, float ySize, float zSi
 	this->type = BLOCK;
 	blockType = type;
 	position = defaultPosition = pos;
+	defaultPosition.y += 2.3f;
 
 	this->xSize = xSize;
 	this->ySize = ySize;

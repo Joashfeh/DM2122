@@ -1798,10 +1798,16 @@ void Assignment2::UpdateStarAnimation(double dt) {
 			((Blocks*)World[i])->starRotateAmount += dt * 60;
 			((Blocks*)World[i])->timeCounter += dt;
 
+			if (((Blocks*)World[i])->timeCounter < 0.3)
+				World[i]->position.y += dt * 8;
+
+			else {
+				World[i]->position.y = 0.3 * sin(((Blocks*)World[i])->timeCounter) + ((Blocks*)World[i])->defaultPosition.y;
+			}
+
 			if (((Blocks*)World[i])->starRotateAmount > 360)
 				((Blocks*)World[i])->starRotateAmount = 0;
 
-			World[i]->position.y = 0.3 * sin(((Blocks*)World[i])->timeCounter) + ((Blocks*)World[i])->defaultPosition.y;
 		}
 	}
 }

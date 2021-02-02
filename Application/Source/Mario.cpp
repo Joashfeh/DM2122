@@ -39,6 +39,7 @@ bool AABB(Entities& a, Entities& b) {
 }
 
 bool Mario::Collision(Entities& entity) {
+
     if (AABB(*this, entity)) {
             
         if (((Blocks*)&entity)->blockType == STAR) {
@@ -87,7 +88,7 @@ bool Mario::Collision(Entities& entity) {
 
                     if (((Blocks*)&entity)->blockType == QUESTION_BLOCK && velocity.y > 0) {
                         ((Blocks*)&entity)->blockType = UNBREAKABLE;
-                        Assignment2::World.push_back(new Blocks(STAR, Vector3(((Blocks*)&entity)->position.x, ((Blocks*)&entity)->position.y + 2.3, 1), 1, 1, 1));
+                        Assignment2::World.push_back(new Blocks(STAR, Vector3(((Blocks*)&entity)->position.x, ((Blocks*)&entity)->position.y, 1), 1, 1, 1));
                     }
           
                     this->velocity.y = -0.3;

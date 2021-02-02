@@ -68,7 +68,7 @@ void JumpHandler(bool& jump, double dt) {
 
 	if (Assignment2::player.kill) {
 		jump = true;
-		stoppedJumping = true;
+		stoppedJumping = false;
 
 		if (jumpTimeCounter > 0) {
 			Assignment2::player.velocity.y += 9.81 * dt * 1.f;

@@ -1,13 +1,16 @@
 #include "UpdateHandler.h"
 #include "Assignment2.h"
 #include "Application.h"
+#include "Mario.h"
 
 float jumpTime = 0.2f;
 float jumpTimeCounter = 0.f;
 bool stoppedJumping = true;
 
 void UpdateHandler(float& bodyAngle, bool& jump, double dt) {
+	
 	Assignment2::player.position += Assignment2::player.velocity;
+
 	MovementHandler(bodyAngle, dt);
 	JumpHandler(jump, dt);
 
@@ -38,20 +41,20 @@ void MovementHandler(float& bodyAngle, double dt) {
 
 	if (Application::IsKeyPressed('A')) {
 		bodyAngle = 270;
-		Assignment2::player.velocityGoal = -0.4;
+		Assignment2::player.velocityGoal = -0.275;
 	}
 
 	if (Application::IsKeyPressed('D')) {
 		bodyAngle = 90;
-		Assignment2::player.velocityGoal = 0.4;
+		Assignment2::player.velocityGoal = 0.275;
 	}
 }
 
 // Jumping
 void JumpHandler(bool& jump, double dt) {
 
-	float highJumpMultiplier = 3.f;
-	float lowJumpMultiplier = 1.f;
+	float highJumpMultiplier = 2.5f;
+	float lowJumpMultiplier = 0.5f;
 
 	if (Assignment2::player.grounded) {
 		Assignment2::player.velocity.y = 0;

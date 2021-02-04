@@ -1826,7 +1826,28 @@ void Assignment2::Generate1_1() {
 
 	// first 69 blocks
 	for (int x = generateX; generateX < 138; generateX += 2) {
-		for (int y = 1; y < 9; y += 2) {
+		for (int y = 1; y < 11; y += 2) {
+			World.push_back(new Blocks(UNBREAKABLE, Vector3(generateX, -y, 1), 2, 2, 2));
+			World.push_back(new Blocks(UNBREAKABLE, Vector3(generateX, -y, -1), 2, 2, 2));
+		}
+	}
+	// after 2 empty spaces
+	generateX += 8;
+
+	// 15 blocks
+	for (int x = generateX; generateX - x < 30; generateX += 2) {
+		for (int y = 1; y < 11; y += 2) {
+			World.push_back(new Blocks(UNBREAKABLE, Vector3(generateX, -y, 1), 2, 2, 2));
+			World.push_back(new Blocks(UNBREAKABLE, Vector3(generateX, -y, -1), 2, 2, 2));
+		}
+	}
+
+	// 6 empty spaces
+	generateX += 12;
+
+	// next 64 blocks
+	for (int x = generateX; generateX - x < 128; generateX += 2) {
+		for (int y = 1; y < 11; y += 2) {
 			World.push_back(new Blocks(UNBREAKABLE, Vector3(generateX, -y, 1), 2, 2, 2));
 			World.push_back(new Blocks(UNBREAKABLE, Vector3(generateX, -y, -1), 2, 2, 2));
 		}
@@ -1834,25 +1855,27 @@ void Assignment2::Generate1_1() {
 
 	generateX += 8;
 
-	// after 2 empty spaces
-	for (int x = generateX; generateX - x < 30; generateX += 2) {
-		for (int y = 1; y < 9; y += 2) {
+	for (int x = generateX; generateX - x < 106; generateX += 2) {
+		for (int y = 1; y < 11; y += 2) {
 			World.push_back(new Blocks(UNBREAKABLE, Vector3(generateX, -y, 1), 2, 2, 2));
 			World.push_back(new Blocks(UNBREAKABLE, Vector3(generateX, -y, -1), 2, 2, 2));
 		}
 	}
 
-	World.push_back(new Blocks(BRICK, Vector3(6, 10, 1), 2, 2, 2));
+	World.push_back(new Blocks(BRICK, Vector3(24, 7, 1), 2, 2, 2));
+	World.push_back(new Blocks(QUESTION_BLOCK, Vector3(26, 7, 1), 2, 2, 2));
+	World.push_back(new Blocks(BRICK, Vector3(28, 7, 1), 2, 2, 2));
+	World.push_back(new Blocks(QUESTION_BLOCK, Vector3(30, 7, 1), 2, 2, 2));
+	World.push_back(new Blocks(BRICK, Vector3(32, 7, 1), 2, 2, 2));
 
 	for (int i = -24; i < 0; i += 2) {
-		for (int y = 1; y < 9; y += 2) {
+		for (int y = 1; y < 11; y += 2) {
 			World.push_back(new Blocks(UNBREAKABLE, Vector3(i, -y, 1), 2, 2, 2));
 			World.push_back(new Blocks(UNBREAKABLE, Vector3(i, -y, -1), 2, 2, 2));
 		}
 	}
 
-	World.push_back(new Blocks(QUESTION_BLOCK, Vector3(8, 10, 1), 2, 2, 2));
+	World.push_back(new Blocks(QUESTION_BLOCK, Vector3(16, 7, 1), 2, 2, 2));
 	World.push_back(new Goomba(Vector3(10, 1, 0)));
 
 }
-

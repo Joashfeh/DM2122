@@ -231,11 +231,10 @@ void Assignment2::Update(double dt) {
 		player.dead = false;
 	}
 
-	if (player.position.x < camera.position.x - 20)
-		player.position.x = camera.position.x - 20;
+	if (player.position.x < camera.position.x - 18)
+		player.position.x = camera.position.x - 18;
 
 	UpdateHandler(bodyDirectionAngle, jump, dt);
-
 	for (int i = 0; i < World.size(); ++i)
 		player.Collision(*World[i]);
 

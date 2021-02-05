@@ -19,7 +19,6 @@ Goomba::Goomba(Vector3 pos) {
 Goomba::~Goomba() {
 }
 
-bool Goomba::Collision(Entities& entity)
-{
+bool Goomba::Collision(Entities& entity) {
 	return false;
 }

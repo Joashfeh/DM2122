@@ -3,7 +3,7 @@
 
 #include "Light.h"
 #include "Scene.h"
-#include "Camera4.h"
+#include "Camera3.h"
 #include "Camera5.h"
 #include "Mesh.h"
 #include "MatrixStack.h"
@@ -75,6 +75,7 @@ class Assignment2 : public Scene {
 		GEO_BLOB,
 		GEO_BRICK,
 		GEO_GOOMBA,
+		GEO_FIREBALL,
 		GEO_STAR,
 		GEO_FLOOR,
 		GEO_TEXT,

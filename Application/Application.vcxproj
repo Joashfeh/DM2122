@@ -153,9 +153,9 @@
     <ClCompile Include="Source\Camera.cpp" />
     <ClCompile Include="Source\Camera2.cpp" />
     <ClCompile Include="Source\Camera3.cpp" />
-    <ClCompile Include="Source\Camera4.cpp" />
     <ClCompile Include="Source\Camera5.cpp" />
     <ClCompile Include="Source\Entities.cpp" />
+    <ClCompile Include="Source\Fireball.cpp" />
     <ClCompile Include="Source\Goomba.cpp" />
     <ClCompile Include="Source\LoadOBJ.cpp" />
     <ClCompile Include="Source\LoadTextData.cpp" />
@@ -164,7 +164,6 @@
     <ClCompile Include="Source\Mario.cpp" />
     <ClCompile Include="Source\Mesh.cpp" />
     <ClCompile Include="Source\MeshBuilder.cpp" />
-    <ClCompile Include="Source\Mobs.cpp" />
     <ClCompile Include="Source\Scene1.cpp" />
     <ClCompile Include="Source\Scene2.cpp" />
     <ClCompile Include="Source\Scene3.cpp" />
@@ -189,9 +188,9 @@
     <ClInclude Include="Source\Camera.h" />
     <ClInclude Include="Source\Camera2.h" />
     <ClInclude Include="Source\Camera3.h" />
-    <ClInclude Include="Source\Camera4.h" />
     <ClInclude Include="Source\Camera5.h" />
     <ClInclude Include="Source\Entities.h" />
+    <ClInclude Include="Source\Fireball.h" />
     <ClInclude Include="Source\Goomba.h" />
     <ClInclude Include="Source\Light.h" />
     <ClInclude Include="Source\LoadOBJ.h" />
@@ -200,7 +199,6 @@
     <ClInclude Include="Source\Mario.h" />
     <ClInclude Include="Source\Mesh.h" />
     <ClInclude Include="Source\MeshBuilder.h" />
-    <ClInclude Include="Source\Mobs.h" />
     <ClInclude Include="Source\Scene.h" />
     <ClInclude Include="Source\Scene1.h" />
     <ClInclude Include="Source\Scene2.h" />

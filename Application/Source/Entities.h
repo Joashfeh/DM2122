@@ -3,6 +3,7 @@
 #include <Vector3.h>
 
 enum ENTITY_TYPE {
+	FIREBALL,
 	GOOMBA,
 	BLOCK,
 };

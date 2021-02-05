@@ -5,6 +5,7 @@ public:
 	Vector3 velocity;
 	float velocityGoal;
 
+	bool shoot;
 	bool superStar;
 	bool dead;
 	bool kill;
@@ -14,6 +15,7 @@ public:
 	~Mario();
 
 	void Init();
+	bool AABB(Entities& a, Entities& b);
 	bool Collision(Entities& entity);
 
 };

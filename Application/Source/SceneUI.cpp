@@ -88,7 +88,7 @@ void SceneUI::Init()
 	light[1].spotDirection.Set(2.f, 1.f, 0.f);
 
 	meshList[GEO_QUAD] = MeshBuilder::GenerateQuad("quad", Color(1, 1, 1), 1.f);
-	meshList[GEO_QUAD]->textureID = LoadTGA("Image//SuperMrMario.tga");
+	meshList[GEO_QUAD]->textureID = LoadTGA("Image//mario.tga");
 	meshList[GEO_AXES] = MeshBuilder::GenerateAxes("Axes", 1000, 1000, 1000);
 	meshList[GEO_LIGHTBALL] = MeshBuilder::GenerateSphere("Light ball", Color(1, 1, 1), 16, 16);
 	meshList[GEO_SPHERE] = MeshBuilder::GenerateSphere("Sphere", Color(1, 1, 1), 48, 48);
@@ -444,6 +444,7 @@ void SceneUI::RenderSkybox()
 
 	modelStack.PushMatrix();
 	modelStack.Translate(0, 500, 0);
+	modelStack.Rotate(90, 0, 1, 0);
 	modelStack.Rotate(90, 1, 0, 0);
 	modelStack.Scale(1000, 1000, 1000);
 	RenderMesh(meshList[GEO_TOP], false);

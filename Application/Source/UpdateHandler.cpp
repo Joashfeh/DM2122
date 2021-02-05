@@ -2,23 +2,44 @@
 #include "Assignment2.h"
 #include "Application.h"
 #include "Mario.h"
+#include "Fireball.h"
 
 float jumpTime = 0.2f;
 float jumpTimeCounter = 0.f;
+float shootTimer = 1.f;
 bool stoppedJumping = true;
+bool shootFireball = false;
 
 void UpdateHandler(float& bodyAngle, bool& jump, double dt) {
 	
+	if (Application::IsKeyReleased('Q') && !Assignment2::player.shoot) {
+		Assignment2::player.shoot = true;
+		shootFireball = false;
+	}
+
+	if (Assignment2::player.shoot) {
+		shootTimer -= dt;
+	}
+
+	if (shootTimer < 0) {
+		Assignment2::player.shoot = false;
+		shootTimer = 1.f;
+	}
+		
+
+	if (Application::IsKeyPressed('Q') && !shootFireball) {
+		Assignment2::World.push_back(new Fireball(bodyAngle));
+		shootFireball = true;
+	}
+
 	Assignment2::player.position += Assignment2::player.velocity;
 
 	MovementHandler(bodyAngle, dt);
 	JumpHandler(jump, dt);
 
-	if (Assignment2::player.position.y < -20)
-		Assignment2::player.dead = true;
-		
-
 	Assignment2::player.grounded = false;
+	if (Assignment2::player.position.y < -20)
+		Assignment2::player.dead = true;		
 }
 
 // Movement

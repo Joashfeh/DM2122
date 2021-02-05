@@ -87,9 +87,6 @@
     <ClCompile Include="Source\UpdateHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Camera4.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\SceneText.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -108,13 +105,13 @@
     <ClCompile Include="Source\Blocks.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Mobs.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\SceneUI.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Goomba.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Fireball.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -197,9 +194,6 @@
     <ClInclude Include="Source\UpdateHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Camera4.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Source\SceneText.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -218,13 +212,13 @@
     <ClInclude Include="Source\Blocks.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Mobs.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Source\SceneUI.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\Goomba.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Fireball.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

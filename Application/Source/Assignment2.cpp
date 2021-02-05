@@ -11,6 +11,7 @@
 #include <sstream>
 #include "Blocks.h"
 #include "Goomba.h"
+#include "Fireball.h"
 
 Mario Assignment2::player;
 std::vector<Entities*> Assignment2::World;
@@ -185,6 +186,9 @@ void Assignment2::Init()
 	meshList[GEO_GOOMBA] = MeshBuilder::GenerateOBJMTL("goomba", "OBJ//goomba.obj", "OBJ//goomba.mtl");
 	meshList[GEO_GOOMBA]->textureID = LoadTGA("Image//goomba.tga");
 
+	meshList[GEO_FIREBALL] = MeshBuilder::GenerateOBJMTL("fireball", "OBJ//fireball_mario.obj", "OBJ//fireball_mario.mtl");
+	meshList[GEO_FIREBALL]->textureID = LoadTGA("Image//fireball_mario.tga");
+
 	meshList[GEO_STAR] = MeshBuilder::GenerateOBJMTL("MarioStar", "OBJ//star.obj", "OBJ//star.mtl");
 
 	Mtx44 projection;
@@ -235,8 +239,41 @@ void Assignment2::Update(double dt) {
 		player.position.x = camera.position.x - 18;
 
 	UpdateHandler(bodyDirectionAngle, jump, dt);
-	for (int i = 0; i < World.size(); ++i)
-		player.Collision(*World[i]);
+
+	for (int i = 0; i < World.size(); ++i) {
+		if (World[i] != nullptr) {
+			bool success = player.Collision(*World[i]);
+			if (success)
+				World[i] = nullptr;
+		}
+	}
+
+	for (int i = 0; i < World.size(); ++i) {
+		if (World[i] != nullptr) {
+			if (World[i]->type == FIREBALL) {
+				((Fireball*)World[i])->Update(bodyDirectionAngle);
+				if ((World[i]->position.x > 500) || (World[i]->position.x < -16)) {
+					delete World[i];
+					World[i] = nullptr;
+					continue;
+				}
+
+				for (int k = 0; k < World.size(); ++k) {
+					if (World[k] != nullptr) {
+						if (((Fireball*)World[i])->AABB(*World[i], *World[k]) && World[k]->type != FIREBALL) {
+							if (World[k]->type == GOOMBA) {
+								delete World[k];
+								World[k] = nullptr;
+							}
+							delete World[i];
+							World[i] = nullptr;
+							break;
+						}
+					}
+				}
+			}
+		}
+	}
 
 	UpdateStarAnimation(dt);
 
@@ -542,7 +579,7 @@ void Assignment2::RenderSkybox()
 
 	modelStack.PushMatrix();
 	modelStack.Translate(0, 500, 0);
-	modelStack.Rotate(90, 0, 1, 0);
+	modelStack.Rotate(-90, 0, 1, 0);
 	modelStack.Rotate(90, 1, 0, 0);
 	modelStack.Scale(1000, 1000, 1000);
 	RenderMesh(meshList[GEO_TOP], false);
@@ -1651,45 +1688,53 @@ void Assignment2::RenderQuestionBlock() {
 
 void Assignment2::RenderBlocks() {
 	for (int i = 0; i < World.size(); ++i) {
+		if (World[i] != nullptr) {
+			switch (World[i]->type) {
+			case BLOCK:
 
-		switch (World[i]->type) {
-		case BLOCK:
+				modelStack.PushMatrix();
+				modelStack.Translate(World[i]->position.x, World[i]->position.y, World[i]->position.z);
+				// modelStack.Scale(1.1, 1.1, 1.1);
 
-			modelStack.PushMatrix();
-			modelStack.Translate(World[i]->position.x, World[i]->position.y, World[i]->position.z);
-			// modelStack.Scale(1.1, 1.1, 1.1);
+				switch (((Blocks*)World[i])->blockType) {
+				case BARRIER:
+					break;
+				case BRICK:
+					RenderMesh(meshList[GEO_BRICK], toggleLight);
+					break;
+				case UNBREAKABLE:
+					RenderMesh(meshList[GEO_BRICK], toggleLight);
+					break;
+				case QUESTION_BLOCK:
+					// modelStack.Scale(1 / 1.1, 1 / 1.1, 1 / 1.1);
+					RenderQuestionBlock();
+					break;
+				case STAR:
+					modelStack.Rotate(((Blocks*)World[i])->starRotateAmount, 0, 1, 0);
+					modelStack.Scale(0.8, 0.8, 0.8);
+					RenderMesh(meshList[GEO_STAR], toggleLight);
+				}
+				modelStack.PopMatrix();
+				break;
 
-			switch (((Blocks*)World[i])->blockType) {
-			case BARRIER:
+			case GOOMBA:
+				modelStack.PushMatrix();
+				modelStack.Translate(World[i]->position.x, World[i]->position.y + 0.3, World[i]->position.z);
+				modelStack.Rotate(-90, 0, 1, 0);
+				modelStack.Scale(0.5, 0.5, 0.5);
+				RenderMesh(meshList[GEO_GOOMBA], toggleLight);
+				modelStack.PopMatrix();
 				break;
-			case BRICK:
-				RenderMesh(meshList[GEO_BRICK], toggleLight);
-				break;
-			case UNBREAKABLE:
-				RenderMesh(meshList[GEO_BRICK], toggleLight);
-				break;
-			case QUESTION_BLOCK:
-				// modelStack.Scale(1 / 1.1, 1 / 1.1, 1 / 1.1);
-				RenderQuestionBlock();
-				break;
-			case STAR:
-				modelStack.Rotate(((Blocks*)World[i])->starRotateAmount, 0, 1, 0);
-				modelStack.Scale(0.8, 0.8, 0.8);
-				RenderMesh(meshList[GEO_STAR], toggleLight);
+			case FIREBALL:
+				modelStack.PushMatrix();
+				modelStack.Translate(World[i]->position.x, World[i]->position.y - 0.3, World[i]->position.z);
+				modelStack.Rotate(-90, 0, 1, 0);
+				modelStack.Scale(World[i]->xSize / 4, World[i]->ySize / 4, World[i]->zSize / 4);
+				RenderMesh(meshList[GEO_FIREBALL], toggleLight);
+				modelStack.PopMatrix();
 			}
-			modelStack.PopMatrix();
-			break;
 
-		case GOOMBA:
-			modelStack.PushMatrix();
-			modelStack.Translate(World[i]->position.x, World[i]->position.y + 0.3, World[i]->position.z);
-			modelStack.Rotate(-90, 0, 1, 0);
-			modelStack.Scale(0.5, 0.5, 0.5);
-			RenderMesh(meshList[GEO_GOOMBA], toggleLight);
-			modelStack.PopMatrix();
-			break;
 		}
-
 	}
 
 }
@@ -1793,20 +1838,22 @@ void Assignment2::ResetAnimation()
 
 void Assignment2::UpdateStarAnimation(double dt) {
 	for (int i = 0; i < World.size(); ++i) {
-		if (((Blocks*)World[i])->blockType == STAR) {
-			((Blocks*)World[i])->starRotateAmount += dt * 60;
-			((Blocks*)World[i])->timeCounter += dt;
+		if (World[i] != nullptr) {
+			if (((Blocks*)World[i])->blockType == STAR) {
+				((Blocks*)World[i])->starRotateAmount += dt * 60;
+				((Blocks*)World[i])->timeCounter += dt;
 
-			if (((Blocks*)World[i])->timeCounter < 0.3)
-				World[i]->position.y += dt * 8;
+				if (((Blocks*)World[i])->timeCounter < 0.3)
+					World[i]->position.y += dt * 8;
 
-			else {
-				World[i]->position.y = 0.3 * sin(((Blocks*)World[i])->timeCounter) + ((Blocks*)World[i])->defaultPosition.y;
+				else {
+					World[i]->position.y = 0.3 * sin(((Blocks*)World[i])->timeCounter) + ((Blocks*)World[i])->defaultPosition.y;
+				}
+
+				if (((Blocks*)World[i])->starRotateAmount > 360)
+					((Blocks*)World[i])->starRotateAmount = 0;
+
 			}
-
-			if (((Blocks*)World[i])->starRotateAmount > 360)
-				((Blocks*)World[i])->starRotateAmount = 0;
-
 		}
 	}
 }
@@ -1862,11 +1909,11 @@ void Assignment2::Generate1_1() {
 		}
 	}
 
-	World.push_back(new Blocks(BRICK, Vector3(24, 7, 1), 2, 2, 2));
-	World.push_back(new Blocks(QUESTION_BLOCK, Vector3(26, 7, 1), 2, 2, 2));
-	World.push_back(new Blocks(BRICK, Vector3(28, 7, 1), 2, 2, 2));
-	World.push_back(new Blocks(QUESTION_BLOCK, Vector3(30, 7, 1), 2, 2, 2));
-	World.push_back(new Blocks(BRICK, Vector3(32, 7, 1), 2, 2, 2));
+	World.push_back(new Blocks(BRICK, Vector3(24, 7, 0), 2, 2, 2));
+	World.push_back(new Blocks(QUESTION_BLOCK, Vector3(26, 7, 0), 2, 2, 2));
+	World.push_back(new Blocks(BRICK, Vector3(28, 7, 0), 2, 2, 2));
+	World.push_back(new Blocks(QUESTION_BLOCK, Vector3(30, 7, 0), 2, 2, 2));
+	World.push_back(new Blocks(BRICK, Vector3(32, 7, 0), 2, 2, 2));
 
 	for (int i = -24; i < 0; i += 2) {
 		for (int y = 1; y < 11; y += 2) {
@@ -1875,7 +1922,7 @@ void Assignment2::Generate1_1() {
 		}
 	}
 
-	World.push_back(new Blocks(QUESTION_BLOCK, Vector3(16, 7, 1), 2, 2, 2));
+	World.push_back(new Blocks(QUESTION_BLOCK, Vector3(16, 7, 0), 2, 2, 2));
 	World.push_back(new Goomba(Vector3(10, 1, 0)));
 
 }

@@ -12,6 +12,8 @@ enum BLOCK_TYPE {
 class Blocks : public Entities {
 public:
 
+	// ive gotten too far into not using polymorphism im gonna put all my variables into here sorry :/
+
 	double	   starRotateAmount;
 	double     timeCounter;
 	Vector3    defaultPosition;

@@ -12,6 +12,7 @@
 #include "Blocks.h"
 #include "Goomba.h"
 #include "Fireball.h"
+#include "QuestionBlock.h"
 
 Mario Assignment2::player;
 std::vector<Entities*> Assignment2::World;
@@ -31,7 +32,6 @@ void Assignment2::Init()
 		player.position.Set(-15, 10, 0);
 
 		bodyDirectionAngle = 90;
-		bodySize = 0.5;
 		bodyAngle = 0;
 		headAngle = 0;
 
@@ -54,7 +54,6 @@ void Assignment2::Init()
 
 		running = false;
 		jump = false;
-		scaling = false;
 
 		time = 0;
 		translateX = 0;
@@ -190,6 +189,10 @@ void Assignment2::Init()
 	meshList[GEO_FIREBALL]->textureID = LoadTGA("Image//fireball_mario.tga");
 
 	meshList[GEO_STAR] = MeshBuilder::GenerateOBJMTL("MarioStar", "OBJ//star.obj", "OBJ//star.mtl");
+	meshList[GEO_PIPE] = MeshBuilder::GenerateOBJMTL("Pipe", "OBJ//pipe.obj", "OBJ//pipe.mtl");
+
+	meshList[GEO_MUSHROOM] = MeshBuilder::GenerateOBJMTL("Mushroom", "OBJ//powerup.obj", "OBJ//powerup.mtl");
+	meshList[GEO_MUSHROOM]->textureID = LoadTGA("Image//skin.tga");
 
 	Mtx44 projection;
 	projection.SetToPerspective(45.f, 4.f / 3.f, 0.1f, 1000.f);
@@ -342,10 +345,6 @@ void Assignment2::Update(double dt) {
 			running = false;
 	}
 
-	// Scale Control
-	if (Application::IsKeyPressed('Q'))
-		scaling = true;	
-
 	// Function Updates
 	{
 		if (running && jump)
@@ -354,7 +353,7 @@ void Assignment2::Update(double dt) {
 		if (running && !jump)
 			ModelRun(dt);
 
-		if (scaling)
+		if (player.scaled)
 			ModelScale(dt);
 
 		if (jump)
@@ -371,6 +370,7 @@ void Assignment2::Update(double dt) {
 		player.Init();
 		camera.Reset();
 		Generate1_1();
+		frames = 0;
 	}
 		
 }
@@ -408,6 +408,12 @@ void Assignment2::Render() {
 	RenderSkybox();
 	RenderMario();
 	RenderBlocks();
+
+	//modelStack.PushMatrix();
+	//modelStack.Scale(0.75, 0.75, 0.75);
+	//modelStack.Translate(0, -1, 0);
+	//RenderMesh(meshList[GEO_MUSHROOM], toggleLight);
+	//modelStack.PopMatrix();
 
 	//modelStack.PushMatrix();
 	//modelStack.Translate(8, 12, 1);
@@ -610,7 +616,7 @@ void Assignment2::RenderMario() {
 	modelStack.PushMatrix();
 	modelStack.Translate(player.position.x, player.position.y - 1.5, player.position.z);
 	modelStack.Rotate(bodyDirectionAngle, 0, 1, 0);
-	modelStack.Scale(bodySize, bodySize, bodySize);
+	modelStack.Scale(player.bodySize, player.bodySize, player.bodySize);
 	modelStack.Translate(0, 2.4, 0);
 	modelStack.Rotate(bodyAngle, 1, 0, 0);
 	{
@@ -1686,6 +1692,163 @@ void Assignment2::RenderQuestionBlock() {
 	modelStack.PopMatrix();
 }
 
+void Assignment2::RenderFireFlower()
+{
+
+	// Stalk
+	modelStack.PushMatrix();
+	modelStack.Scale(1.3, 1.3, 1.3);
+
+	// Leaf
+	{
+		modelStack.PushMatrix();
+		modelStack.Translate(0.15, -.1, 0);
+		modelStack.Rotate(-25, 0, 0, 1);
+		modelStack.Scale(0.1, 0.1, 0.1);
+
+		{
+			modelStack.PushMatrix();
+			modelStack.Scale(1, 1, 0.1);
+			meshList[GEO_CUBE]->material.kAmbient.Set(0.f, 0.1f, 0.f);
+			meshList[GEO_CUBE]->material.kDiffuse.Set(0.f, 0.9f, 0.f);
+			meshList[GEO_CUBE]->material.kSpecular.Set(0.f, 0.3f, 0.f);
+			RenderMesh(meshList[GEO_CUBE], toggleLight);
+			modelStack.PopMatrix();
+
+			modelStack.PushMatrix();
+			modelStack.Translate(2, 2, 0);
+			modelStack.Scale(1, 1, 0.1);
+			meshList[GEO_CUBE]->material.kAmbient.Set(0.f, 0.1f, 0.f);
+			meshList[GEO_CUBE]->material.kDiffuse.Set(0.f, 0.9f, 0.f);
+			meshList[GEO_CUBE]->material.kSpecular.Set(0.f, 0.3f, 0.f);
+			RenderMesh(meshList[GEO_CUBE], toggleLight);
+			modelStack.PopMatrix();
+
+			modelStack.PushMatrix();
+			modelStack.Translate(1, 1, 0);
+			modelStack.Rotate(90, 1, 0, 0);
+			modelStack.Scale(2, 0.1, 2);
+			meshList[GEO_CYLINDER]->material.kAmbient.Set(0.f, 0.1f, 0.f);
+			meshList[GEO_CYLINDER]->material.kDiffuse.Set(0.f, 0.9f, 0.f);
+			meshList[GEO_CYLINDER]->material.kSpecular.Set(0.f, 0.3f, 0.f);
+			RenderMesh(meshList[GEO_CYLINDER], toggleLight);
+			modelStack.PopMatrix();
+		}
+
+		modelStack.PopMatrix();
+	}
+
+	// Leaf
+	{
+		modelStack.PushMatrix();
+		modelStack.Translate(-0.15, -.1, 0);
+		modelStack.Rotate(180, 0, 1, 0);
+		modelStack.Rotate(-25, 0, 0, 1);
+		modelStack.Scale(0.1, 0.1, 0.1);
+
+		{
+			modelStack.PushMatrix();
+			modelStack.Scale(1, 1, 0.1);
+			meshList[GEO_CUBE]->material.kAmbient.Set(0.f, 0.1f, 0.f);
+			meshList[GEO_CUBE]->material.kDiffuse.Set(0.f, 0.9f, 0.f);
+			meshList[GEO_CUBE]->material.kSpecular.Set(0.f, 0.3f, 0.f);
+			RenderMesh(meshList[GEO_CUBE], toggleLight);
+			modelStack.PopMatrix();
+
+			modelStack.PushMatrix();
+			modelStack.Translate(2, 2, 0);
+			modelStack.Scale(1, 1, 0.1);
+			meshList[GEO_CUBE]->material.kAmbient.Set(0.f, 0.1f, 0.f);
+			meshList[GEO_CUBE]->material.kDiffuse.Set(0.f, 0.9f, 0.f);
+			meshList[GEO_CUBE]->material.kSpecular.Set(0.f, 0.3f, 0.f);
+			RenderMesh(meshList[GEO_CUBE], toggleLight);
+			modelStack.PopMatrix();
+
+			modelStack.PushMatrix();
+			modelStack.Translate(1, 1, 0);
+			modelStack.Rotate(90, 1, 0, 0);
+			modelStack.Scale(2, 0.1, 2);
+			meshList[GEO_CYLINDER]->material.kAmbient.Set(0.f, 0.1f, 0.f);
+			meshList[GEO_CYLINDER]->material.kDiffuse.Set(0.f, 0.9f, 0.f);
+			meshList[GEO_CYLINDER]->material.kSpecular.Set(0.f, 0.3f, 0.f);
+			RenderMesh(meshList[GEO_CYLINDER], toggleLight);
+			modelStack.PopMatrix();
+		}
+
+		modelStack.PopMatrix();
+	}
+
+	// Head
+	{
+		modelStack.PushMatrix();
+		modelStack.Translate(0, 0.75, 0);
+
+		{
+			// Eye
+			{
+				modelStack.PushMatrix();
+				modelStack.Translate(0.1, 0, 0.2);
+				modelStack.Scale(0.05, 0.15, 0.05);
+				meshList[GEO_SPHERE]->material.kAmbient.Set(0.05f, 0.05f, 0.05f);
+				meshList[GEO_SPHERE]->material.kDiffuse.Set(0.1f, 0.1f, 0.1f);
+				meshList[GEO_SPHERE]->material.kSpecular.Set(0.7f, 0.7f, 0.7f);
+				RenderMesh(meshList[GEO_SPHERE], toggleLight);
+				modelStack.PopMatrix();
+			}
+
+			// Eye
+			{
+				modelStack.PushMatrix();
+				modelStack.Translate(-0.1, 0, 0.2);
+				modelStack.Scale(0.05, 0.15, 0.05);
+				meshList[GEO_SPHERE]->material.kAmbient.Set(0.05f, 0.05f, 0.05f);
+				meshList[GEO_SPHERE]->material.kDiffuse.Set(0.1f, 0.1f, 0.1f);
+				meshList[GEO_SPHERE]->material.kSpecular.Set(0.7f, 0.7f, 0.7f);
+				RenderMesh(meshList[GEO_SPHERE], toggleLight);
+				modelStack.PopMatrix();
+			}
+		}
+
+		modelStack.Scale(0.3, 0.24, 0.24);
+
+		// Yellow Ring
+		{
+			modelStack.PushMatrix();
+			modelStack.Rotate(90, 1, 0, 0);
+			meshList[GEO_TORUS2]->material.kAmbient.Set(0.1f, 0.1f, 0.f);
+			meshList[GEO_TORUS2]->material.kDiffuse.Set(0.6f, 0.6f, 0.f);
+			meshList[GEO_TORUS2]->material.kSpecular.Set(0.3f, 0.3f, 0.f);
+			RenderMesh(meshList[GEO_TORUS2], toggleLight);
+			modelStack.PopMatrix();
+		}
+
+		// Red Ring
+		{
+			modelStack.PushMatrix();
+			modelStack.Rotate(90, 1, 0, 0);
+			modelStack.Scale(1.6, 1.6, 1.6);
+			meshList[GEO_TORUS]->material.kAmbient.Set(0.1f, 0.f, 0.f);
+			meshList[GEO_TORUS]->material.kDiffuse.Set(0.6f, 0.f, 0.f);
+			meshList[GEO_TORUS]->material.kSpecular.Set(0.3f, 0.f, 0.f);
+			RenderMesh(meshList[GEO_TORUS], toggleLight);
+			modelStack.PopMatrix();
+		}
+
+		meshList[GEO_SPHERE]->material.kAmbient.Set(0.3f, 0.3f, 0.3f);
+		meshList[GEO_SPHERE]->material.kDiffuse.Set(0.9f, 0.9f, 0.9f);
+		meshList[GEO_SPHERE]->material.kSpecular.Set(0.3f, 0.3f, 0.3f);
+		RenderMesh(meshList[GEO_SPHERE], toggleLight);
+		modelStack.PopMatrix();
+	}
+
+	modelStack.Scale(0.05, 0.75, 0.05);
+	meshList[GEO_CYLINDER]->material.kAmbient.Set(0.f, 0.1f, 0.f);
+	meshList[GEO_CYLINDER]->material.kDiffuse.Set(0.f, 0.9f, 0.f);
+	meshList[GEO_CYLINDER]->material.kSpecular.Set(0.f, 0.3f, 0.f);
+	RenderMesh(meshList[GEO_CYLINDER], toggleLight);
+	modelStack.PopMatrix();
+}
+
 void Assignment2::RenderBlocks() {
 	for (int i = 0; i < World.size(); ++i) {
 		if (World[i] != nullptr) {
@@ -1706,13 +1869,26 @@ void Assignment2::RenderBlocks() {
 					RenderMesh(meshList[GEO_BRICK], toggleLight);
 					break;
 				case QUESTION_BLOCK:
-					// modelStack.Scale(1 / 1.1, 1 / 1.1, 1 / 1.1);
 					RenderQuestionBlock();
 					break;
+				case PIPE:
+					RenderMesh(meshList[GEO_PIPE], toggleLight);
 				case STAR:
 					modelStack.Rotate(((Blocks*)World[i])->starRotateAmount, 0, 1, 0);
 					modelStack.Scale(0.8, 0.8, 0.8);
 					RenderMesh(meshList[GEO_STAR], toggleLight);
+					break;
+				case FLOWER:
+					modelStack.Rotate(((Blocks*)World[i])->starRotateAmount, 0, 1, 0);
+					modelStack.Scale(0.8, 0.8, 0.8);
+					RenderFireFlower();
+					break;
+				case SHROOM:
+					modelStack.Rotate(((Blocks*)World[i])->starRotateAmount, 0, 1, 0);
+					modelStack.Scale(0.75, 0.75, 0.75);
+					modelStack.Translate(0, -1, 0);
+					RenderMesh(meshList[GEO_MUSHROOM], toggleLight);
+					break;
 				}
 				modelStack.PopMatrix();
 				break;
@@ -1795,20 +1971,19 @@ void Assignment2::ModelScale(double dt)
 
 	switch (frames) {
 	case 10:
-		bodySize = 0.575;
+		player.bodySize = 0.575;
 		break;
 	case 20:
-		bodySize = 0.5;
+		player.bodySize = 0.5;
 		break;
 	case 30:
-		bodySize = 0.625;
+		player.bodySize = 0.625;
 		break;
 	case 40:
-		bodySize = 0.575;
+		player.bodySize = 0.575;
 		break;
 	case 50:
-		bodySize = 0.675;
-
+		player.bodySize = 0.675;
 		break;
 	}
 
@@ -1839,7 +2014,7 @@ void Assignment2::ResetAnimation()
 void Assignment2::UpdateStarAnimation(double dt) {
 	for (int i = 0; i < World.size(); ++i) {
 		if (World[i] != nullptr) {
-			if (((Blocks*)World[i])->blockType == STAR) {
+			if (((Blocks*)World[i])->blockType == STAR || ((Blocks*)World[i])->blockType == FLOWER || ((Blocks*)World[i])->blockType == SHROOM) {
 				((Blocks*)World[i])->starRotateAmount += dt * 60;
 				((Blocks*)World[i])->timeCounter += dt;
 
@@ -1863,6 +2038,7 @@ void Assignment2::ResetGame()
 	player.Init();
 	camera.Reset();
 	Generate1_1();
+	frames = 0;
 }
 
 void Assignment2::Generate1_1() {
@@ -1910,9 +2086,9 @@ void Assignment2::Generate1_1() {
 	}
 
 	World.push_back(new Blocks(BRICK, Vector3(24, 7, 0), 2, 2, 2));
-	World.push_back(new Blocks(QUESTION_BLOCK, Vector3(26, 7, 0), 2, 2, 2));
+	World.push_back(new QuestionBlock(SUPERSTAR, Vector3(26, 7, 0), 2, 2, 2));
 	World.push_back(new Blocks(BRICK, Vector3(28, 7, 0), 2, 2, 2));
-	World.push_back(new Blocks(QUESTION_BLOCK, Vector3(30, 7, 0), 2, 2, 2));
+	World.push_back(new QuestionBlock(MUSHROOM, Vector3(30, 7, 0), 2, 2, 2));
 	World.push_back(new Blocks(BRICK, Vector3(32, 7, 0), 2, 2, 2));
 
 	for (int i = -24; i < 0; i += 2) {
@@ -1922,7 +2098,8 @@ void Assignment2::Generate1_1() {
 		}
 	}
 
-	World.push_back(new Blocks(QUESTION_BLOCK, Vector3(16, 7, 0), 2, 2, 2));
+	World.push_back(new QuestionBlock(FIREFLOWER, Vector3(16, 7, 0), 2, 2, 2));
 	World.push_back(new Goomba(Vector3(10, 1, 0)));
+	World.push_back(new Blocks(PIPE, Vector3(0, 0, 0), 3.5, 9.5, 3.5));
 
 }

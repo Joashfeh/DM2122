@@ -74,9 +74,12 @@ class Assignment2 : public Scene {
 		GEO_BACK,
 		GEO_BLOB,
 		GEO_BRICK,
+		GEO_PIPE,
 		GEO_GOOMBA,
 		GEO_FIREBALL,
+		GEO_FLOWER,
 		GEO_STAR,
+		GEO_MUSHROOM,
 		GEO_FLOOR,
 		GEO_TEXT,
 		NUM_GEOMETRY,
@@ -104,29 +107,19 @@ private:
 	float translateX, translateY, translateZ;
 	float bodySize;
 	float bodyDirectionAngle;
-
 	float bodyAngle;
 	float headAngle;
-
-	// Right Arm
 	float rightShoulderAngle;
-	float leftShoulderAngle;
-
-	// Left Arm
 	float rightElbowAngle;
-	float leftElbowAngle;
-
-	// Right Leg
 	float rightHipAngle;
-	float leftHipAngle;
-
-	// Left Leg
 	float rightKneeAngle;
+	float leftShoulderAngle;
+	float leftElbowAngle;
+	float leftHipAngle;
 	float leftKneeAngle;
 
 	bool running;
 	bool jump;
-	bool scaling;
 
 	double time;
 
@@ -153,6 +146,7 @@ private:
 	void RenderMario();
 	void RenderQuestionMark();
 	void RenderQuestionBlock();
+	void RenderFireFlower();
 	void RenderBlocks();
 
 	void ModelRun(double dt);

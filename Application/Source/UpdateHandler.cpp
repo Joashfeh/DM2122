@@ -11,8 +11,9 @@ bool stoppedJumping = true;
 bool shootFireball = false;
 
 void UpdateHandler(float& bodyAngle, bool& jump, double dt) {
-	
-	if (Application::IsKeyReleased('Q') && !Assignment2::player.shoot) {
+
+
+	if (Application::IsMousePressed(0) && !Assignment2::player.shoot) {
 		Assignment2::player.shoot = true;
 		shootFireball = false;
 	}
@@ -27,7 +28,7 @@ void UpdateHandler(float& bodyAngle, bool& jump, double dt) {
 	}
 		
 
-	if (Application::IsKeyPressed('Q') && !shootFireball) {
+	if (!Application::IsMousePressed(0) && !shootFireball && Assignment2::player.flower) {
 		Assignment2::World.push_back(new Fireball(bodyAngle));
 		shootFireball = true;
 	}

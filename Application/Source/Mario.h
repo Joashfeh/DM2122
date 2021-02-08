@@ -4,8 +4,11 @@ class Mario : public Entities {
 public:
 	Vector3 velocity;
 	float velocityGoal;
+	float bodySize;
 
+	bool scaled;
 	bool shoot;
+	bool flower;
 	bool superStar;
 	bool dead;
 	bool kill;

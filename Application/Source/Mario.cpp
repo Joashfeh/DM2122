@@ -110,6 +110,9 @@ bool Mario::Collision(Entities& entity) {
 
                         if (((QuestionBlock*)&entity)->itemType == MUSHROOM)
                             Assignment2::World.push_back(new Blocks(SHROOM, Vector3(((Blocks*)&entity)->position.x, ((Blocks*)&entity)->position.y, 0), 1, 1, 1));
+
+                        if (((QuestionBlock*)&entity)->itemType == GOLDCOIN)
+                            Assignment2::World.push_back(new Blocks(COIN, Vector3(((Blocks*)&entity)->position.x, ((Blocks*)&entity)->position.y, 0), 1, 1, 1));
                         
                         ((QuestionBlock*)&entity)->hit = true;
                         return false;

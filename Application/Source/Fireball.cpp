@@ -10,13 +10,13 @@ Fireball::Fireball(float angle) {
 
     if (angle == 90) {
         position = Assignment2::player.position;
-        position.x += 1.f;
+        position.x += 1.5f;
         position.y += 0.25f;
         direction = 0;
     }
     else {
         position = Assignment2::player.position;
-        position.x -= 1.f;
+        position.x -= 1.5f;
         position.y -= 0.25f;
         direction = 1;
     }

@@ -5,6 +5,7 @@ enum ITEM_TYPE {
 	SUPERSTAR,
 	FIREFLOWER,
 	MUSHROOM,
+	GOLDCOIN,
 };
 
 class QuestionBlock : public Blocks {

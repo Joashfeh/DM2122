@@ -60,6 +60,8 @@ void Assignment2::Init()
 		translateY = 0;
 		translateZ = 0;
 
+		flagHeight = 0;
+
 		toggleLight = true;
 	}
 
@@ -193,6 +195,11 @@ void Assignment2::Init()
 
 	meshList[GEO_MUSHROOM] = MeshBuilder::GenerateOBJMTL("Mushroom", "OBJ//powerup.obj", "OBJ//powerup.mtl");
 	meshList[GEO_MUSHROOM]->textureID = LoadTGA("Image//skin.tga");
+
+	meshList[GEO_COIN] = MeshBuilder::GenerateOBJMTL("coin", "OBJ//coin.obj", "OBJ//coin.mtl");
+
+	meshList[GEO_FLAGPOLE] = MeshBuilder::GenerateOBJMTL("flagpole", "OBJ//flagpole.obj", "OBJ//flagpole.mtl");
+	meshList[GEO_FLAG] = MeshBuilder::GenerateOBJMTL("flag", "OBJ//flag.obj", "OBJ//flag.mtl");
 
 	Mtx44 projection;
 	projection.SetToPerspective(45.f, 4.f / 3.f, 0.1f, 1000.f);
@@ -1889,6 +1896,16 @@ void Assignment2::RenderBlocks() {
 					modelStack.Translate(0, -1, 0);
 					RenderMesh(meshList[GEO_MUSHROOM], toggleLight);
 					break;
+				case COIN:
+					modelStack.Rotate(((Blocks*)World[i])->starRotateAmount, 0, 1, 0);
+					RenderMesh(meshList[GEO_COIN], toggleLight);
+					break;
+				case POLE:
+					RenderMesh(meshList[GEO_FLAGPOLE], toggleLight);
+					modelStack.PushMatrix();
+					modelStack.Translate(0, flagHeight, 0);
+					RenderMesh(meshList[GEO_FLAG], toggleLight);
+					modelStack.PopMatrix();
 				}
 				modelStack.PopMatrix();
 				break;
@@ -2014,7 +2031,7 @@ void Assignment2::ResetAnimation()
 void Assignment2::UpdateStarAnimation(double dt) {
 	for (int i = 0; i < World.size(); ++i) {
 		if (World[i] != nullptr) {
-			if (((Blocks*)World[i])->blockType == STAR || ((Blocks*)World[i])->blockType == FLOWER || ((Blocks*)World[i])->blockType == SHROOM) {
+			if (((Blocks*)World[i])->blockType == STAR || ((Blocks*)World[i])->blockType == FLOWER || ((Blocks*)World[i])->blockType == SHROOM || ((Blocks*)World[i])->blockType == COIN) {
 				((Blocks*)World[i])->starRotateAmount += dt * 60;
 				((Blocks*)World[i])->timeCounter += dt;
 
@@ -2041,6 +2058,10 @@ void Assignment2::ResetGame()
 	frames = 0;
 }
 
+// this code sucks
+// dont take away marks for this
+// .
+// please
 void Assignment2::Generate1_1() {
 
 	World.clear();
@@ -2048,14 +2069,44 @@ void Assignment2::Generate1_1() {
 	int generateX = 0;
 
 	// first 69 blocks
-	for (int x = generateX; generateX < 138; generateX += 2) {
+	for (int x = generateX; generateX < 122; generateX += 2) {
 		for (int y = 1; y < 11; y += 2) {
 			World.push_back(new Blocks(UNBREAKABLE, Vector3(generateX, -y, 1), 2, 2, 2));
 			World.push_back(new Blocks(UNBREAKABLE, Vector3(generateX, -y, -1), 2, 2, 2));
 		}
 	}
+	World.push_back(new QuestionBlock(GOLDCOIN, Vector3(16, 7, 0), 2, 2, 2));
+
+	World.push_back(new Blocks(BRICK, Vector3(24, 7, 0), 2, 2, 2));
+	World.push_back(new QuestionBlock(MUSHROOM, Vector3(26, 7, 0), 2, 2, 2));
+	World.push_back(new Blocks(BRICK, Vector3(28, 7, 0), 2, 2, 2));
+	World.push_back(new QuestionBlock(GOLDCOIN, Vector3(30, 7, 0), 2, 2, 2));
+	World.push_back(new Blocks(BRICK, Vector3(32, 7, 0), 2, 2, 2));
+
+	World.push_back(new Goomba(Vector3(28, 1, 0)));
+
+	World.push_back(new Blocks(PIPE, Vector3(41, -1, 0), 3.5, 9.5, 3.5));
+	World.push_back(new Blocks(PIPE, Vector3(61, 1, 0), 3.5, 9.5, 3.5));
+	World.push_back(new Blocks(PIPE, Vector3(77, 3, 0), 3.5, 9.5, 3.5));
+	World.push_back(new Blocks(PIPE, Vector3(99, 3, 0), 3.5, 9.5, 3.5, true));
+
+
 	// after 2 empty spaces
 	generateX += 8;
+
+	World.push_back(new Blocks(BRICK, Vector3(generateX + 14, 7, 0), 2, 2, 2));
+	World.push_back(new QuestionBlock(MUSHROOM, Vector3(generateX + 16, 7, 0), 2, 2, 2));
+	World.push_back(new Blocks(BRICK, Vector3(generateX + 18, 7, 0), 2, 2, 2));
+
+	World.push_back(new Blocks(BRICK, Vector3(generateX + 20, 15, 0), 2, 2, 2));
+	World.push_back(new Blocks(BRICK, Vector3(generateX + 22, 15, 0), 2, 2, 2));
+	World.push_back(new Blocks(BRICK, Vector3(generateX + 24, 15, 0), 2, 2, 2));
+	World.push_back(new Blocks(BRICK, Vector3(generateX + 26, 15, 0), 2, 2, 2));
+	World.push_back(new Blocks(BRICK, Vector3(generateX + 28, 15, 0), 2, 2, 2));
+	World.push_back(new Blocks(BRICK, Vector3(generateX + 30, 15, 0), 2, 2, 2));
+	World.push_back(new Blocks(BRICK, Vector3(generateX + 32, 15, 0), 2, 2, 2));
+	World.push_back(new Blocks(BRICK, Vector3(generateX + 34, 15, 0), 2, 2, 2));
+	World.push_back(new Blocks(BRICK, Vector3(generateX + 36, 15, 0), 2, 2, 2));
 
 	// 15 blocks
 	for (int x = generateX; generateX - x < 30; generateX += 2) {
@@ -2068,8 +2119,96 @@ void Assignment2::Generate1_1() {
 	// 6 empty spaces
 	generateX += 12;
 
+	World.push_back(new Blocks(BRICK, Vector3(generateX + 4, 15, 0), 2, 2, 2));
+	World.push_back(new Blocks(BRICK, Vector3(generateX + 6, 15, 0), 2, 2, 2));
+	World.push_back(new Blocks(BRICK, Vector3(generateX + 8, 15, 0), 2, 2, 2));
+	World.push_back(new QuestionBlock(GOLDCOIN, Vector3(generateX + 10, 15, 0), 2, 2, 2));
+
+	World.push_back(new QuestionBlock(GOLDCOIN, Vector3(generateX + 10, 7, 0), 2, 2, 2));
+	World.push_back(new Blocks(BRICK, Vector3(generateX + 22, 7, 0), 2, 2, 2));
+	World.push_back(new QuestionBlock(SUPERSTAR, Vector3(generateX + 24, 7, 0), 2, 2, 2));
+
+	World.push_back(new QuestionBlock(GOLDCOIN, Vector3(generateX + 34, 7, 0), 2, 2, 2));
+	World.push_back(new QuestionBlock(FIREFLOWER, Vector3(generateX + 40, 15, 0), 2, 2, 2));
+	World.push_back(new QuestionBlock(GOLDCOIN, Vector3(generateX + 40, 7, 0), 2, 2, 2));
+	World.push_back(new QuestionBlock(GOLDCOIN, Vector3(generateX + 46, 7, 0), 2, 2, 2));
+
+	// help
+
+	World.push_back(new Blocks(BRICK, Vector3(generateX + 52, 7, 0), 2, 2, 2));
+
+	World.push_back(new Blocks(BRICK, Vector3(generateX + 58, 15, 0), 2, 2, 2));
+	World.push_back(new Blocks(BRICK, Vector3(generateX + 60, 15, 0), 2, 2, 2));
+	World.push_back(new Blocks(BRICK, Vector3(generateX + 62, 15, 0), 2, 2, 2));
+
+	World.push_back(new Blocks(BRICK, Vector3(generateX + 70, 15, 0), 2, 2, 2));
+	World.push_back(new QuestionBlock(GOLDCOIN, Vector3(generateX + 72, 15, 0), 2, 2, 2));
+	World.push_back(new QuestionBlock(GOLDCOIN, Vector3(generateX + 74, 15, 0), 2, 2, 2));
+	World.push_back(new Blocks(BRICK, Vector3(generateX + 72, 7, 0), 2, 2, 2));
+	World.push_back(new Blocks(BRICK, Vector3(generateX + 74, 7, 0), 2, 2, 2));
+	World.push_back(new Blocks(BRICK, Vector3(generateX + 76, 15, 0), 2, 2, 2));
+
+	World.push_back(new Blocks(BRICK, Vector3(generateX + 72, 7, 0), 2, 2, 2));
+	World.push_back(new Blocks(BRICK, Vector3(generateX + 74, 7, 0), 2, 2, 2));
+
+	for (int z = -1; z < 2; z += 2) {
+		World.push_back(new Blocks(UNBREAKABLE, Vector3(generateX + 82, 1, z), 2, 2, 2));
+		World.push_back(new Blocks(UNBREAKABLE, Vector3(generateX + 84, 1, z), 2, 2, 2));
+		World.push_back(new Blocks(UNBREAKABLE, Vector3(generateX + 86, 1, z), 2, 2, 2));
+		World.push_back(new Blocks(UNBREAKABLE, Vector3(generateX + 88, 1, z), 2, 2, 2));
+		World.push_back(new Blocks(UNBREAKABLE, Vector3(generateX + 84, 3, z), 2, 2, 2));
+		World.push_back(new Blocks(UNBREAKABLE, Vector3(generateX + 86, 3, z), 2, 2, 2));
+		World.push_back(new Blocks(UNBREAKABLE, Vector3(generateX + 88, 3, z), 2, 2, 2));
+		World.push_back(new Blocks(UNBREAKABLE, Vector3(generateX + 86, 5, z), 2, 2, 2));
+		World.push_back(new Blocks(UNBREAKABLE, Vector3(generateX + 88, 5, z), 2, 2, 2));
+		World.push_back(new Blocks(UNBREAKABLE, Vector3(generateX + 88, 7, z), 2, 2, 2));
+	}
+
+	for (int z = -1; z < 2; z += 2) {
+		World.push_back(new Blocks(UNBREAKABLE, Vector3(generateX + 94, 1, z), 2, 2, 2));
+		World.push_back(new Blocks(UNBREAKABLE, Vector3(generateX + 96, 1, z), 2, 2, 2));
+		World.push_back(new Blocks(UNBREAKABLE, Vector3(generateX + 98, 1, z), 2, 2, 2));
+		World.push_back(new Blocks(UNBREAKABLE, Vector3(generateX + 100, 1, z), 2, 2, 2));
+		World.push_back(new Blocks(UNBREAKABLE, Vector3(generateX + 94, 3, z), 2, 2, 2));
+		World.push_back(new Blocks(UNBREAKABLE, Vector3(generateX + 96, 3, z), 2, 2, 2));
+		World.push_back(new Blocks(UNBREAKABLE, Vector3(generateX + 98, 3, z), 2, 2, 2));
+		World.push_back(new Blocks(UNBREAKABLE, Vector3(generateX + 94, 5, z), 2, 2, 2));
+		World.push_back(new Blocks(UNBREAKABLE, Vector3(generateX + 96, 5, z), 2, 2, 2));
+		World.push_back(new Blocks(UNBREAKABLE, Vector3(generateX + 94, 7, z), 2, 2, 2));
+	}
+
+	for (int z = -1; z < 2; z += 2) {
+		World.push_back(new Blocks(UNBREAKABLE, Vector3(generateX + 82 + 28, 1, z), 2, 2, 2));
+		World.push_back(new Blocks(UNBREAKABLE, Vector3(generateX + 84 + 28, 1, z), 2, 2, 2));
+		World.push_back(new Blocks(UNBREAKABLE, Vector3(generateX + 86 + 28, 1, z), 2, 2, 2));
+		World.push_back(new Blocks(UNBREAKABLE, Vector3(generateX + 88 + 28, 1, z), 2, 2, 2));
+		World.push_back(new Blocks(UNBREAKABLE, Vector3(generateX + 84 + 28, 3, z), 2, 2, 2));
+		World.push_back(new Blocks(UNBREAKABLE, Vector3(generateX + 86 + 28, 3, z), 2, 2, 2));
+		World.push_back(new Blocks(UNBREAKABLE, Vector3(generateX + 88 + 28, 3, z), 2, 2, 2));
+		World.push_back(new Blocks(UNBREAKABLE, Vector3(generateX + 86 + 28, 5, z), 2, 2, 2));
+		World.push_back(new Blocks(UNBREAKABLE, Vector3(generateX + 88 + 28, 5, z), 2, 2, 2));
+		World.push_back(new Blocks(UNBREAKABLE, Vector3(generateX + 88 + 28, 7, z), 2, 2, 2));
+		World.push_back(new Blocks(UNBREAKABLE, Vector3(generateX + 90 + 28, 7, z), 2, 2, 2));
+		World.push_back(new Blocks(UNBREAKABLE, Vector3(generateX + 90 + 28, 5, z), 2, 2, 2));
+		World.push_back(new Blocks(UNBREAKABLE, Vector3(generateX + 90 + 28, 3, z), 2, 2, 2));
+		World.push_back(new Blocks(UNBREAKABLE, Vector3(generateX + 90 + 28, 1, z), 2, 2, 2));
+	}
+
+	for (int z = -1; z < 2; z += 2) {
+		World.push_back(new Blocks(UNBREAKABLE, Vector3(generateX + 94 + 34, 1, z), 2, 2, 2));
+		World.push_back(new Blocks(UNBREAKABLE, Vector3(generateX + 96 + 34, 1, z), 2, 2, 2));
+		World.push_back(new Blocks(UNBREAKABLE, Vector3(generateX + 98 + 34, 1, z), 2, 2, 2));
+		World.push_back(new Blocks(UNBREAKABLE, Vector3(generateX + 100 + 34, 1, z), 2, 2, 2));
+		World.push_back(new Blocks(UNBREAKABLE, Vector3(generateX + 94 + 34, 3, z), 2, 2, 2));
+		World.push_back(new Blocks(UNBREAKABLE, Vector3(generateX + 96 + 34, 3, z), 2, 2, 2));
+		World.push_back(new Blocks(UNBREAKABLE, Vector3(generateX + 98 + 34, 3, z), 2, 2, 2));
+		World.push_back(new Blocks(UNBREAKABLE, Vector3(generateX + 94 + 34, 5, z), 2, 2, 2));
+		World.push_back(new Blocks(UNBREAKABLE, Vector3(generateX + 96 + 34, 5, z), 2, 2, 2));
+		World.push_back(new Blocks(UNBREAKABLE, Vector3(generateX + 94 + 34, 7, z), 2, 2, 2));
+	}
+
 	// next 64 blocks
-	for (int x = generateX; generateX - x < 128; generateX += 2) {
+	for (int x = generateX; generateX - x < 120; generateX += 2) {
 		for (int y = 1; y < 11; y += 2) {
 			World.push_back(new Blocks(UNBREAKABLE, Vector3(generateX, -y, 1), 2, 2, 2));
 			World.push_back(new Blocks(UNBREAKABLE, Vector3(generateX, -y, -1), 2, 2, 2));
@@ -2078,6 +2217,75 @@ void Assignment2::Generate1_1() {
 
 	generateX += 8;
 
+	World.push_back(new Blocks(PIPE, Vector3(generateX + 17, -1, 0), 3.5, 9.5, 3.5));
+	World.push_back(new Blocks(BRICK, Vector3(generateX + 26, 7, 0), 2, 2, 2));
+	World.push_back(new Blocks(BRICK, Vector3(generateX + 28, 7, 0), 2, 2, 2));
+	World.push_back(new QuestionBlock(GOLDCOIN, Vector3(generateX + 30, 7, 0), 2, 2, 2));
+	World.push_back(new Blocks(BRICK, Vector3(generateX + 32, 7, 0), 2, 2, 2));
+	World.push_back(new Blocks(PIPE, Vector3(generateX + 49, -1, 0), 3.5, 9.5, 3.5));
+
+	// last staircase
+	int tempX = generateX;
+	int width = 16;
+	int height = 16;
+
+	for (int z = -1; z < 2; z += 2) {
+		World.push_back(new Blocks(UNBREAKABLE, Vector3(tempX + 52, 1, z), 2, 2, 2));
+		World.push_back(new Blocks(UNBREAKABLE, Vector3(tempX + 54, 1, z), 2, 2, 2));
+		World.push_back(new Blocks(UNBREAKABLE, Vector3(tempX + 56, 1, z), 2, 2, 2));
+		World.push_back(new Blocks(UNBREAKABLE, Vector3(tempX + 58, 1, z), 2, 2, 2));
+		World.push_back(new Blocks(UNBREAKABLE, Vector3(tempX + 60, 1, z), 2, 2, 2));
+		World.push_back(new Blocks(UNBREAKABLE, Vector3(tempX + 62, 1, z), 2, 2, 2));
+		World.push_back(new Blocks(UNBREAKABLE, Vector3(tempX + 64, 1, z), 2, 2, 2));
+		World.push_back(new Blocks(UNBREAKABLE, Vector3(tempX + 66, 1, z), 2, 2, 2));
+		World.push_back(new Blocks(UNBREAKABLE, Vector3(tempX + 68, 1, z), 2, 2, 2));
+
+		World.push_back(new Blocks(UNBREAKABLE, Vector3(tempX + 54, 3, z), 2, 2, 2));
+		World.push_back(new Blocks(UNBREAKABLE, Vector3(tempX + 56, 3, z), 2, 2, 2));
+		World.push_back(new Blocks(UNBREAKABLE, Vector3(tempX + 58, 3, z), 2, 2, 2));
+		World.push_back(new Blocks(UNBREAKABLE, Vector3(tempX + 60, 3, z), 2, 2, 2));
+		World.push_back(new Blocks(UNBREAKABLE, Vector3(tempX + 62, 3, z), 2, 2, 2));
+		World.push_back(new Blocks(UNBREAKABLE, Vector3(tempX + 64, 3, z), 2, 2, 2));
+		World.push_back(new Blocks(UNBREAKABLE, Vector3(tempX + 66, 3, z), 2, 2, 2));
+		World.push_back(new Blocks(UNBREAKABLE, Vector3(tempX + 68, 3, z), 2, 2, 2));
+
+		World.push_back(new Blocks(UNBREAKABLE, Vector3(tempX + 56, 5, z), 2, 2, 2));
+		World.push_back(new Blocks(UNBREAKABLE, Vector3(tempX + 58, 5, z), 2, 2, 2));
+		World.push_back(new Blocks(UNBREAKABLE, Vector3(tempX + 60, 5, z), 2, 2, 2));
+		World.push_back(new Blocks(UNBREAKABLE, Vector3(tempX + 62, 5, z), 2, 2, 2));
+		World.push_back(new Blocks(UNBREAKABLE, Vector3(tempX + 64, 5, z), 2, 2, 2));
+		World.push_back(new Blocks(UNBREAKABLE, Vector3(tempX + 66, 5, z), 2, 2, 2));
+		World.push_back(new Blocks(UNBREAKABLE, Vector3(tempX + 68, 5, z), 2, 2, 2));
+
+		World.push_back(new Blocks(UNBREAKABLE, Vector3(tempX + 58, 7, z), 2, 2, 2));
+		World.push_back(new Blocks(UNBREAKABLE, Vector3(tempX + 60, 7, z), 2, 2, 2));
+		World.push_back(new Blocks(UNBREAKABLE, Vector3(tempX + 62, 7, z), 2, 2, 2));
+		World.push_back(new Blocks(UNBREAKABLE, Vector3(tempX + 64, 7, z), 2, 2, 2));
+		World.push_back(new Blocks(UNBREAKABLE, Vector3(tempX + 66, 7, z), 2, 2, 2));
+		World.push_back(new Blocks(UNBREAKABLE, Vector3(tempX + 68, 7, z), 2, 2, 2));
+
+		World.push_back(new Blocks(UNBREAKABLE, Vector3(tempX + 60, 9, z), 2, 2, 2));
+		World.push_back(new Blocks(UNBREAKABLE, Vector3(tempX + 62, 9, z), 2, 2, 2));
+		World.push_back(new Blocks(UNBREAKABLE, Vector3(tempX + 64, 9, z), 2, 2, 2));
+		World.push_back(new Blocks(UNBREAKABLE, Vector3(tempX + 66, 9, z), 2, 2, 2));
+		World.push_back(new Blocks(UNBREAKABLE, Vector3(tempX + 68, 9, z), 2, 2, 2));
+
+		World.push_back(new Blocks(UNBREAKABLE, Vector3(tempX + 62, 11, z), 2, 2, 2));
+		World.push_back(new Blocks(UNBREAKABLE, Vector3(tempX + 64, 11, z), 2, 2, 2));
+		World.push_back(new Blocks(UNBREAKABLE, Vector3(tempX + 66, 11, z), 2, 2, 2));
+		World.push_back(new Blocks(UNBREAKABLE, Vector3(tempX + 68, 11, z), 2, 2, 2));
+
+		World.push_back(new Blocks(UNBREAKABLE, Vector3(tempX + 64, 13, z), 2, 2, 2));
+		World.push_back(new Blocks(UNBREAKABLE, Vector3(tempX + 66, 13, z), 2, 2, 2));
+		World.push_back(new Blocks(UNBREAKABLE, Vector3(tempX + 68, 13, z), 2, 2, 2));
+
+		World.push_back(new Blocks(UNBREAKABLE, Vector3(tempX + 66, 15, z), 2, 2, 2));
+		World.push_back(new Blocks(UNBREAKABLE, Vector3(tempX + 68, 15, z), 2, 2, 2));
+	}
+
+	World.push_back(new Blocks(UNBREAKABLE, Vector3(tempX + 86, 1, 0), 2, 2, 2));
+	World.push_back(new Blocks(POLE, Vector3(tempX + 86, 11, 0), 0.5, 18, 0.5));
+
 	for (int x = generateX; generateX - x < 106; generateX += 2) {
 		for (int y = 1; y < 11; y += 2) {
 			World.push_back(new Blocks(UNBREAKABLE, Vector3(generateX, -y, 1), 2, 2, 2));
@@ -2085,21 +2293,11 @@ void Assignment2::Generate1_1() {
 		}
 	}
 
-	World.push_back(new Blocks(BRICK, Vector3(24, 7, 0), 2, 2, 2));
-	World.push_back(new QuestionBlock(SUPERSTAR, Vector3(26, 7, 0), 2, 2, 2));
-	World.push_back(new Blocks(BRICK, Vector3(28, 7, 0), 2, 2, 2));
-	World.push_back(new QuestionBlock(MUSHROOM, Vector3(30, 7, 0), 2, 2, 2));
-	World.push_back(new Blocks(BRICK, Vector3(32, 7, 0), 2, 2, 2));
-
 	for (int i = -24; i < 0; i += 2) {
 		for (int y = 1; y < 11; y += 2) {
 			World.push_back(new Blocks(UNBREAKABLE, Vector3(i, -y, 1), 2, 2, 2));
 			World.push_back(new Blocks(UNBREAKABLE, Vector3(i, -y, -1), 2, 2, 2));
 		}
 	}
-
-	World.push_back(new QuestionBlock(FIREFLOWER, Vector3(16, 7, 0), 2, 2, 2));
-	World.push_back(new Goomba(Vector3(10, 1, 0)));
-	World.push_back(new Blocks(PIPE, Vector3(0, 0, 0), 3.5, 9.5, 3.5));
 
 }

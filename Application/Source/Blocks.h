@@ -10,6 +10,8 @@ enum BLOCK_TYPE {
 	STAR,
 	FLOWER,
 	SHROOM,
+	COIN,
+	POLE,
 };
 
 class Blocks : public Entities {

@@ -6,7 +6,7 @@
 
 float jumpTime = 0.2f;
 float jumpTimeCounter = 0.f;
-float shootTimer = 1.f;
+float shootTimer = .5f;
 bool stoppedJumping = true;
 bool shootFireball = false;
 
@@ -27,7 +27,7 @@ void UpdateHandler(float& bodyAngle, bool& jump, double dt) {
 		shootTimer = 1.f;
 	}
 		
-
+	 
 	if (!Application::IsMousePressed(0) && !shootFireball && Assignment2::player.flower) {
 		Assignment2::World.push_back(new Fireball(bodyAngle));
 		shootFireball = true;

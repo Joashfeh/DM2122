@@ -80,6 +80,9 @@ class Assignment2 : public Scene {
 		GEO_FLOWER,
 		GEO_STAR,
 		GEO_MUSHROOM,
+		GEO_COIN,
+		GEO_FLAGPOLE,
+		GEO_FLAG,
 		GEO_FLOOR,
 		GEO_TEXT,
 		NUM_GEOMETRY,
@@ -117,6 +120,8 @@ private:
 	float leftElbowAngle;
 	float leftHipAngle;
 	float leftKneeAngle;
+
+	float flagHeight;
 
 	bool running;
 	bool jump;

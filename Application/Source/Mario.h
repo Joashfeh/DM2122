@@ -3,22 +3,22 @@
 class Mario : public Entities {
 public:
 	Vector3 velocity;
-	float   velocityGoal;
-	float   bodySize;
+	float   velocityGoal; // for interpolation
+	float   bodySize; // for model size
 
 	int     Score;
 	bool    Win;
-	bool    hitTimerActive;
+	bool    hitTimerActive; // after hit with mushroom
 	bool    pipeAnimationActive;
 	
-	bool    canMove;
-	bool    scaled;
-	bool    shoot;
-	bool    flower;
-	bool    superStar;
-	bool    dead;
-	bool    kill;
-	bool    grounded;
+	bool    canMove; // for win and pipe
+	bool    scaled; // mushroom
+	bool    shoot; // flower
+	bool    flower; // flower, cant remember why i have shoot honestly
+	bool    superStar; // star.
+	bool    dead; // die
+	bool    kill; // for kill bounce
+	bool    grounded; // help
 
 	Mario();
 	~Mario();

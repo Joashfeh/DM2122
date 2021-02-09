@@ -89,6 +89,7 @@ bool Mario::Collision(Entities& entity) {
         float displacementX = entity.position.x - this->position.x;
         float displacementY = entity.position.y - this->position.y;
 
+        // help
         if (abs(displacementX) * 1.f / entity.xSize > abs(displacementY) * 1.f / entity.ySize) {
 
             if (entity.type == GOOMBA) {
@@ -123,6 +124,7 @@ bool Mario::Collision(Entities& entity) {
               
 
         }
+        // me
         else {
             if (displacementY < 0) {
                 if (((Blocks*)&entity)->blockType == PIPE) {

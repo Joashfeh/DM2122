@@ -261,10 +261,13 @@ void Assignment2::Update(double dt) {
 	if (player.position.x < camera.position.x - 18 && camera.type == SIDESCROLL)
 		player.position.x = camera.position.x - 18;
 
+	// THIS IS SO BAD
+	// AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 	if (player.canMove && camera.type == SIDESCROLL) {
 		UpdateHandler(bodyDirectionAngle, jump, dt);
 		for (int i = 0; i < World.size(); ++i) {
 			if (World[i] != nullptr) {
+				// success checks if the world pointer should be set to null after object deletion to save memory space
 				bool success = player.Collision(*World[i]);
 				if (success) {
 					World[i] = nullptr;
@@ -288,6 +291,7 @@ void Assignment2::Update(double dt) {
 		}
 	}
 
+	// IOSADNGOIPDGNPOANHGIPFUADEJHBIOPJAJH
 	else {
 		ResetAnimation();
 		if (player.Win) {
@@ -306,6 +310,8 @@ void Assignment2::Update(double dt) {
 
 			}
 		}
+
+		// OH MY GOD WHY
 		if (player.pipeAnimationActive) {
 			if (pipeTime < 1.25) {
 				player.position.y -= dt * 9;
@@ -325,6 +331,7 @@ void Assignment2::Update(double dt) {
 
 			pipeTime += dt;
 		}
+		// i need a proper engine
 	}
 
 	for (int i = 0; i < World.size(); ++i) {
@@ -1904,6 +1911,8 @@ void Assignment2::RenderFireFlower()
 	modelStack.PopMatrix();
 }
 
+// this is like
+// decent
 void Assignment2::RenderBlocks() {
 	for (int i = 0; i < World.size(); ++i) {
 		if (World[i] != nullptr) {
@@ -2329,24 +2338,25 @@ void Assignment2::Generate1_1() {
 		World.push_back(new Blocks(UNBREAKABLE, Vector3(tempX + 66, 5, z), 2, 2, 2));
 		World.push_back(new Blocks(UNBREAKABLE, Vector3(tempX + 68, 5, z), 2, 2, 2));
 
+		// help
 		World.push_back(new Blocks(UNBREAKABLE, Vector3(tempX + 58, 7, z), 2, 2, 2));
 		World.push_back(new Blocks(UNBREAKABLE, Vector3(tempX + 60, 7, z), 2, 2, 2));
 		World.push_back(new Blocks(UNBREAKABLE, Vector3(tempX + 62, 7, z), 2, 2, 2));
 		World.push_back(new Blocks(UNBREAKABLE, Vector3(tempX + 64, 7, z), 2, 2, 2));
 		World.push_back(new Blocks(UNBREAKABLE, Vector3(tempX + 66, 7, z), 2, 2, 2));
 		World.push_back(new Blocks(UNBREAKABLE, Vector3(tempX + 68, 7, z), 2, 2, 2));
-
+		// me
 		World.push_back(new Blocks(UNBREAKABLE, Vector3(tempX + 60, 9, z), 2, 2, 2));
 		World.push_back(new Blocks(UNBREAKABLE, Vector3(tempX + 62, 9, z), 2, 2, 2));
 		World.push_back(new Blocks(UNBREAKABLE, Vector3(tempX + 64, 9, z), 2, 2, 2));
 		World.push_back(new Blocks(UNBREAKABLE, Vector3(tempX + 66, 9, z), 2, 2, 2));
 		World.push_back(new Blocks(UNBREAKABLE, Vector3(tempX + 68, 9, z), 2, 2, 2));
-
+		// please
 		World.push_back(new Blocks(UNBREAKABLE, Vector3(tempX + 62, 11, z), 2, 2, 2));
 		World.push_back(new Blocks(UNBREAKABLE, Vector3(tempX + 64, 11, z), 2, 2, 2));
 		World.push_back(new Blocks(UNBREAKABLE, Vector3(tempX + 66, 11, z), 2, 2, 2));
 		World.push_back(new Blocks(UNBREAKABLE, Vector3(tempX + 68, 11, z), 2, 2, 2));
-
+		// no
 		World.push_back(new Blocks(UNBREAKABLE, Vector3(tempX + 64, 13, z), 2, 2, 2));
 		World.push_back(new Blocks(UNBREAKABLE, Vector3(tempX + 66, 13, z), 2, 2, 2));
 		World.push_back(new Blocks(UNBREAKABLE, Vector3(tempX + 68, 13, z), 2, 2, 2));

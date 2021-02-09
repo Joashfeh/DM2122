@@ -125,11 +125,6 @@ bool Mario::Collision(Entities& entity) {
         }
         else {
             if (displacementY < 0) {
-
-                this->position.y += (ySize / 2 + entity.ySize / 2) + displacementY;
-                grounded = true;
-                kill = false;
-
                 if (((Blocks*)&entity)->blockType == PIPE) {
                     if (((Blocks*)&entity)->pipe == ENTRANCE) {
                         if (!pipeAnimationActive && abs(position.x - entity.position.x) < 0.5) {
@@ -152,6 +147,10 @@ bool Mario::Collision(Entities& entity) {
                     delete& entity;
                     return true;
                 }
+
+                this->position.y += (ySize / 2 + entity.ySize / 2) + displacementY;
+                grounded = true;
+                kill = false;
             }
 
             if (displacementY > 0 && velocity.y > 0) {

@@ -73,17 +73,17 @@ void MovementHandler(float& bodyAngle, double dt) {
 
 	if (Application::IsKeyPressed('A')) {
 		bodyAngle = 270;
-		Assignment2::player.velocityGoal = -0.19;
+		Assignment2::player.velocityGoal = -0.21;
 		if (Application::IsKeyPressed(VK_LSHIFT)) {
-			Assignment2::player.velocityGoal = -0.29;
+			Assignment2::player.velocityGoal = -0.32;
 		}
 	}
 
 	if (Application::IsKeyPressed('D')) {
 		bodyAngle = 90;
-		Assignment2::player.velocityGoal = 0.19;
+		Assignment2::player.velocityGoal = 0.21;
 		if (Application::IsKeyPressed(VK_LSHIFT)) {
-			Assignment2::player.velocityGoal = 0.29;
+			Assignment2::player.velocityGoal = 0.32;
 		}
 	}
 }

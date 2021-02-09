@@ -72,7 +72,6 @@ class Assignment2 : public Scene {
 		GEO_BOTTOM,
 		GEO_FRONT,
 		GEO_BACK,
-		GEO_BLOB,
 		GEO_BRICK,
 		GEO_PIPE,
 		GEO_GOOMBA,

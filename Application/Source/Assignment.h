@@ -107,6 +107,7 @@ private:
 	MS modelStack, viewStack, projectionStack;
 
 	Camera2 camera;
+
 	Mesh* meshList[NUM_GEOMETRY];
 	unsigned m_vertexArrayID;
 	unsigned m_parameters[U_TOTAL];

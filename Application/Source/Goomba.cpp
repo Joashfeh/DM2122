@@ -7,8 +7,9 @@ Goomba::Goomba() {
 
 Goomba::Goomba(Vector3 pos) {
 	this->type = GOOMBA;
-	this->position = pos;
+	this->position = defaultPosition = pos;
 	Dead = false;
+	bodyAngle = -90;
 
 	this->xSize = 1.8;
 	this->ySize = 1.8;

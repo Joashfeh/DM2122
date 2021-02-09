@@ -6,7 +6,7 @@ Blocks::Blocks() {
 Blocks::~Blocks() {
 }
 
-Blocks::Blocks(BLOCK_TYPE type, Vector3 pos, float xSize, float ySize, float zSize, bool pipe) {
+Blocks::Blocks(BLOCK_TYPE type, Vector3 pos, float xSize, float ySize, float zSize, PIPE_TYPE pipe) {
 	this->pipe = pipe;
 	starRotateAmount = 0.f;
 	timeCounter = 0.f;
@@ -30,7 +30,7 @@ Blocks::Blocks(BLOCK_TYPE type, Vector3 pos, float xSize, float ySize, float zSi
 }
 
 Blocks::Blocks(BLOCK_TYPE type, Vector3 pos, float xSize, float ySize, float zSize) {
-	pipe = false;
+	pipe = NIL;
 	starRotateAmount = 0.f;
 	timeCounter = 0.f;
 	this->type = BLOCK;

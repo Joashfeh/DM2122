@@ -3,9 +3,16 @@
 
 #include "Camera.h"
 
+enum CAMERA_TYPE {
+	FIRSTPERSON,
+	SIDESCROLL,
+};
+
 class Camera5 : public Camera
 {
 public:
+	CAMERA_TYPE type;
+
 	float pitch;
 	float yaw;
 

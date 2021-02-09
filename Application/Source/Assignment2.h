@@ -92,6 +92,7 @@ public:
 
 	static std::vector<Entities*> World;
 	static Mario player;
+	static int frames;
 
 	Assignment2();
 	~Assignment2();
@@ -104,8 +105,6 @@ public:
 private:
 
 	int textWidthData[256];
-
-	int frames;
 
 	float translateX, translateY, translateZ;
 	float bodySize;
@@ -127,12 +126,14 @@ private:
 	bool jump;
 
 	double time;
+	double hitTimer;
 
 	bool toggleLight;
 	Light light[2];
 	MS modelStack, viewStack, projectionStack;
 
 	Camera5 camera;
+
 	Mesh* meshList[NUM_GEOMETRY];
 	unsigned m_vertexArrayID;
 	unsigned m_parameters[U_TOTAL];

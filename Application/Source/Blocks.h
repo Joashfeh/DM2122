@@ -14,15 +14,21 @@ enum BLOCK_TYPE {
 	POLE,
 };
 
+enum PIPE_TYPE {
+	NIL,
+	ENTRANCE,
+	EXIT,
+};
+
 class Blocks : public Entities {
 public:
 
 	// ive gotten too far into not using polymorphism im gonna put all my variables into here sorry :/
-	bool       pipe;
 	double	   starRotateAmount;
 	double     timeCounter;
 	Vector3    defaultPosition;
 	BLOCK_TYPE blockType;
+	PIPE_TYPE  pipe;
 
 	Blocks();
 	Blocks(BLOCK_TYPE type, 
@@ -35,7 +41,7 @@ public:
 		float xSize, 
 		float ySize, 
 		float zSize,
-		bool pipe);
+		PIPE_TYPE pipe);
 	~Blocks();
 
 	bool Collision(Entities& entity);

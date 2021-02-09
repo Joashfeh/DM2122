@@ -3,7 +3,9 @@
 
 class Goomba : public Entities {
 public:
-	bool Dead;
+	Vector3 defaultPosition;
+	bool    Dead;
+	float   bodyAngle;
 
 	Goomba();
 	Goomba(Vector3 pos);

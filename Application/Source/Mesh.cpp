@@ -68,14 +68,11 @@ void Mesh::Render()
 	if (materials.size() == 0)
 	{
 		if (mode == DRAW_TRIANGLE_STRIP)
-			glDrawElements(GL_TRIANGLE_STRIP, indexSize,
-				GL_UNSIGNED_INT, 0);
+			glDrawElements(GL_TRIANGLE_STRIP, indexSize, GL_UNSIGNED_INT, 0);
 		else if (mode == DRAW_LINES)
-			glDrawElements(GL_LINES, indexSize,
-				GL_UNSIGNED_INT, 0);
+			glDrawElements(GL_LINES, indexSize, GL_UNSIGNED_INT, 0);
 		else
-			glDrawElements(GL_TRIANGLES, indexSize,
-				GL_UNSIGNED_INT, 0);
+			glDrawElements(GL_TRIANGLES, indexSize, GL_UNSIGNED_INT, 0);
 	}
 	else
 	{
@@ -88,14 +85,11 @@ void Mesh::Render()
 			glUniform3fv(locationKs, 1, &material.kSpecular.r);
 			glUniform1f(locationNs, material.kShininess);
 			if (mode == DRAW_TRIANGLE_STRIP)
-				glDrawElements(GL_TRIANGLE_STRIP, material.size,
-					GL_UNSIGNED_INT, (void*)(offset * sizeof(unsigned)));
+				glDrawElements(GL_TRIANGLE_STRIP, material.size, GL_UNSIGNED_INT, (void*)(offset * sizeof(unsigned)));
 			else if (mode == DRAW_LINES)
-				glDrawElements(GL_LINES, material.size, GL_UNSIGNED_INT,
-					(void*)(offset * sizeof(unsigned)));
+				glDrawElements(GL_LINES, material.size, GL_UNSIGNED_INT, (void*)(offset * sizeof(unsigned)));
 			else
-				glDrawElements(GL_TRIANGLES, material.size,
-					GL_UNSIGNED_INT, (void*)(offset * sizeof(unsigned)));
+				glDrawElements(GL_TRIANGLES, material.size, GL_UNSIGNED_INT, (void*)(offset * sizeof(unsigned)));
 			offset += material.size;
 		}
 	}

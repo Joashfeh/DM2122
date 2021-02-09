@@ -13,6 +13,13 @@ Mario::~Mario() {
 }
 
 void Mario::Init() {
+
+    Score = 0;
+
+    Win = false;
+    pipeAnimationActive = false;
+    hitTimerActive = false;
+    canMove = true;
     scaled = false;
     flower = false;
     superStar = false;
@@ -47,11 +54,65 @@ bool Mario::AABB(Entities& a, Entities& b) {
 bool Mario::Collision(Entities& entity) {
 
     if (AABB(*this, entity)) {
-     
+
+        if (((Blocks*)&entity)->blockType == STAR) {
+            superStar = true;
+            delete& entity;
+            return true;
+        }
+
+        if (((Blocks*)&entity)->blockType == FLOWER) {
+            flower = true;
+            delete& entity;
+            return true;
+        }
+
+        if (((Blocks*)&entity)->blockType == SHROOM) {
+            Assignment2::frames = 0;
+            scaled = true;
+            delete& entity;
+            return true;
+        }
+
+        if (((Blocks*)&entity)->blockType == COIN) {
+            Score += 100;
+            delete& entity;
+            return true;
+        }
+
+        if (((Blocks*)&entity)->blockType == POLE) {
+            canMove = false;
+            Win = true;
+            return false;
+        }
+
         float displacementX = entity.position.x - this->position.x;
         float displacementY = entity.position.y - this->position.y;
 
         if (abs(displacementX) * 1.f / entity.xSize > abs(displacementY) * 1.f / entity.ySize) {
+
+            if (entity.type == GOOMBA) {
+                if (!hitTimerActive) {
+                    if (superStar) {
+                        delete& entity;
+                        return true;
+                    }
+                    else if (scaled) {
+                        scaled = false;
+                        bodySize = 0.5;
+                        hitTimerActive = true;
+                        velocity.x = 0;
+                        return false;
+                    }
+
+                    else
+                        dead = true;
+                }
+                else {
+                    return false;
+                }
+            }
+
             if (displacementX < 0) {
                 this->position.x += (xSize / 2 + entity.xSize / 2) + displacementX;
             }
@@ -59,39 +120,38 @@ bool Mario::Collision(Entities& entity) {
             if (displacementX > 0) {
                 this->position.x -= (xSize / 2 + entity.xSize / 2) - displacementX;
             }
-                
-            if (entity.type == GOOMBA) {
-                if (superStar) {
-                    delete& entity;
-                    return true;
-                }
-
-                else
-                    dead = true;
-            }
+              
 
         }
         else {
-
-            if (((Blocks*)&entity)->blockType == PIPE) {
-                std::cout << abs(displacementX) << std::endl;
-                std::cout << abs(displacementY) << std::endl;
-            }
-
             if (displacementY < 0) {
 
-                if (entity.type != STAR) {
-                    this->position.y += (ySize / 2 + entity.ySize / 2) + displacementY;
-                    grounded = true;
-                    kill = false;
+                this->position.y += (ySize / 2 + entity.ySize / 2) + displacementY;
+                grounded = true;
+                kill = false;
+
+                if (((Blocks*)&entity)->blockType == PIPE) {
+                    if (((Blocks*)&entity)->pipe == ENTRANCE) {
+                        if (!pipeAnimationActive && abs(position.x - entity.position.x) < 0.5) {
+                            if (Application::IsKeyPressed('S')) {
+                                pipeAnimationActive = true;
+                                canMove = false;
+                            }
+                        }
+                    }
                 }
 
                 if (entity.type == GOOMBA) {
-                    kill = true;
+
+                    if (hitTimerActive)
+                        return false;
+
+                    this->Score += 100;
+                    this->grounded = true;
+                    this->kill = true;
                     delete& entity;
                     return true;
                 }
-
             }
 
             if (displacementY > 0 && velocity.y > 0) {
@@ -119,29 +179,11 @@ bool Mario::Collision(Entities& entity) {
                     }
                 }
 
-                if (((Blocks*)&entity)->blockType == BRICK) {
+                if (((Blocks*)&entity)->blockType == BRICK && scaled) {
                     delete& entity;
                     return true;
                 }
             }
-        }
-
-        if (((Blocks*)&entity)->blockType == STAR) {
-            superStar = true;
-            delete& entity;
-            return true;
-        }
-
-        if (((Blocks*)&entity)->blockType == FLOWER) {
-            flower = true;  
-            delete& entity;
-            return true;
-        }
-
-        if (((Blocks*)&entity)->blockType == SHROOM) {
-            scaled = true;
-            delete& entity;
-            return true;
         }
     }
     return false;

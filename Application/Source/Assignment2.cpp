@@ -9,11 +9,14 @@
 #include "UpdateHandler.h"
 #include "LoadTextData.h"
 #include <sstream>
+#include <iomanip>
 #include "Blocks.h"
 #include "Goomba.h"
 #include "Fireball.h"
 #include "QuestionBlock.h"
 
+double pipeTime = 0;
+int Assignment2::frames;
 Mario Assignment2::player;
 std::vector<Entities*> Assignment2::World;
 
@@ -56,6 +59,7 @@ void Assignment2::Init()
 		jump = false;
 
 		time = 0;
+		hitTimer = 0;
 		translateX = 0;
 		translateY = 0;
 		translateZ = 0;
@@ -240,21 +244,86 @@ void Assignment2::Update(double dt) {
 
 	light[1].position.Set(camera.position.x, 50, 30);
 
-	if (player.dead) {
+	if (player.dead && camera.type == SIDESCROLL) {
 		ResetGame();
 		player.dead = false;
 	}
 
-	if (player.position.x < camera.position.x - 18)
+	if (player.hitTimerActive) {
+		hitTimer += dt;
+		if (hitTimer > 1) {
+			hitTimer = 0;
+			player.hitTimerActive = false;
+		}
+
+	}
+
+	if (player.position.x < camera.position.x - 18 && camera.type == SIDESCROLL)
 		player.position.x = camera.position.x - 18;
 
-	UpdateHandler(bodyDirectionAngle, jump, dt);
+	if (player.canMove && camera.type == SIDESCROLL) {
+		UpdateHandler(bodyDirectionAngle, jump, dt);
+		for (int i = 0; i < World.size(); ++i) {
+			if (World[i] != nullptr) {
+				bool success = player.Collision(*World[i]);
+				if (success) {
+					World[i] = nullptr;
+					continue;
+				}
 
-	for (int i = 0; i < World.size(); ++i) {
-		if (World[i] != nullptr) {
-			bool success = player.Collision(*World[i]);
-			if (success)
-				World[i] = nullptr;
+				if (World[i]->type == GOOMBA) {
+					if (((Goomba*)World[i])->defaultPosition.x - World[i]->position.x < 10 && ((Goomba*)World[i])->bodyAngle == -90)
+						World[i]->position.x -= dt * 2;
+
+					else
+						((Goomba*)World[i])->bodyAngle = 90;
+
+					if (World[i]->position.x - ((Goomba*)World[i])->defaultPosition.x < 0 && ((Goomba*)World[i])->bodyAngle == 90)
+						World[i]->position.x += dt * 2;
+
+					else
+						((Goomba*)World[i])->bodyAngle = -90;
+				}
+			}
+		}
+	}
+
+	else {
+		ResetAnimation();
+		if (player.Win) {
+		
+			rightShoulderAngle = -70;
+			leftShoulderAngle = 70;
+
+			rightHipAngle = -70;
+			leftHipAngle = -70;
+
+			if (player.position.y > 3) {
+				if (flagHeight + 18 - player.position.y < 2 && flagHeight + 18 > 2)
+					flagHeight -= dt * 9;
+
+				player.position.y -= dt * 9;
+
+			}
+		}
+		if (player.pipeAnimationActive) {
+			if (pipeTime < 1.25) {
+				player.position.y -= dt * 9;
+			}
+			else if (pipeTime > 1.25 && pipeTime < 1.3) {
+				player.position.x = 317;
+				player.position.y = -1;
+			}
+			else {
+				if (player.position.y < 5.5)
+					player.position.y += dt * 9;
+				else {
+					player.pipeAnimationActive = false;
+					player.canMove = true;
+				}
+			}
+
+			pipeTime += dt;
 		}
 	}
 
@@ -286,8 +355,6 @@ void Assignment2::Update(double dt) {
 	}
 
 	UpdateStarAnimation(dt);
-
-	camera.Update(dt);
 
 	const float LSPEED = 10.f;
 
@@ -353,6 +420,7 @@ void Assignment2::Update(double dt) {
 	}
 
 	// Function Updates
+	if (player.canMove)
 	{
 		if (running && jump)
 			ModelJump(dt);
@@ -374,11 +442,10 @@ void Assignment2::Update(double dt) {
 
 	// Reset
 	if (Application::IsKeyPressed('R')) {
-		player.Init();
-		camera.Reset();
-		Generate1_1();
-		frames = 0;
+		ResetGame();
 	}
+
+	camera.Update(dt);
 		
 }
 
@@ -416,27 +483,8 @@ void Assignment2::Render() {
 	RenderMario();
 	RenderBlocks();
 
-	//modelStack.PushMatrix();
-	//modelStack.Scale(0.75, 0.75, 0.75);
-	//modelStack.Translate(0, -1, 0);
-	//RenderMesh(meshList[GEO_MUSHROOM], toggleLight);
-	//modelStack.PopMatrix();
-
-	//modelStack.PushMatrix();
-	//modelStack.Translate(8, 12, 1);
-	//modelStack.Scale(0.8, 0.8, 0.8);
-	//RenderMesh(meshList[GEO_STAR], toggleLight);
-	//modelStack.PopMatrix();
-
 	//RenderFloor();
 	//RenderMesh(meshList[GEO_AXES], false);
-
-	/*modelStack.PushMatrix();
-	modelStack.Translate(0, 1.3, 0);
-	modelStack.Rotate(-90, 0, 1 ,0);
-	modelStack.Scale(0.5, 0.5, 0.5);
-	RenderMesh(meshList[GEO_GOOMBA], toggleLight);
-	modelStack.PopMatrix();*/
 
 	modelStack.PushMatrix();
 	modelStack.Translate(light[0].position.x, light[0].position.y, light[0].position.z);
@@ -445,9 +493,9 @@ void Assignment2::Render() {
 	modelStack.PopMatrix();
 
 	std::stringstream ss;
-	ss.precision(4);
-	ss << "FPS: " << "60";
-	RenderTextOnScreen(meshList[GEO_TEXT], ss.str(), Color(1, 1, 1), 4, 0, 55);
+	ss.precision(6);
+	ss << "SCORE: " << std::setw(6) << std::setfill('0') << player.Score;
+	RenderTextOnScreen(meshList[GEO_TEXT], ss.str(), Color(0, 0, 0), 4, 2, 55);
 
 
 	Position lightPosition_cameraspace = viewStack.Top() * light[0].position;
@@ -1880,6 +1928,7 @@ void Assignment2::RenderBlocks() {
 					break;
 				case PIPE:
 					RenderMesh(meshList[GEO_PIPE], toggleLight);
+					break;
 				case STAR:
 					modelStack.Rotate(((Blocks*)World[i])->starRotateAmount, 0, 1, 0);
 					modelStack.Scale(0.8, 0.8, 0.8);
@@ -1913,7 +1962,7 @@ void Assignment2::RenderBlocks() {
 			case GOOMBA:
 				modelStack.PushMatrix();
 				modelStack.Translate(World[i]->position.x, World[i]->position.y + 0.3, World[i]->position.z);
-				modelStack.Rotate(-90, 0, 1, 0);
+				modelStack.Rotate(((Goomba*)World[i])->bodyAngle, 0, 1, 0);
 				modelStack.Scale(0.5, 0.5, 0.5);
 				RenderMesh(meshList[GEO_GOOMBA], toggleLight);
 				modelStack.PopMatrix();
@@ -2055,7 +2104,9 @@ void Assignment2::ResetGame()
 	player.Init();
 	camera.Reset();
 	Generate1_1();
+	flagHeight = 0;
 	frames = 0;
+	pipeTime = 0;
 }
 
 // this code sucks
@@ -2088,8 +2139,10 @@ void Assignment2::Generate1_1() {
 	World.push_back(new Blocks(PIPE, Vector3(41, -1, 0), 3.5, 9.5, 3.5));
 	World.push_back(new Blocks(PIPE, Vector3(61, 1, 0), 3.5, 9.5, 3.5));
 	World.push_back(new Blocks(PIPE, Vector3(77, 3, 0), 3.5, 9.5, 3.5));
-	World.push_back(new Blocks(PIPE, Vector3(99, 3, 0), 3.5, 9.5, 3.5, true));
+	World.push_back(new Blocks(PIPE, Vector3(99, 3, 0), 3.5, 9.5, 3.5, ENTRANCE));
 
+	World.push_back(new Goomba(Vector3(90, 1, 0)));
+	World.push_back(new Goomba(Vector3(94, 1, 0)));
 
 	// after 2 empty spaces
 	generateX += 8;
@@ -2108,6 +2161,9 @@ void Assignment2::Generate1_1() {
 	World.push_back(new Blocks(BRICK, Vector3(generateX + 34, 15, 0), 2, 2, 2));
 	World.push_back(new Blocks(BRICK, Vector3(generateX + 36, 15, 0), 2, 2, 2));
 
+	World.push_back(new Goomba(Vector3(generateX + 32, 17, 0)));
+	World.push_back(new Goomba(Vector3(generateX + 36, 17, 0)));
+
 	// 15 blocks
 	for (int x = generateX; generateX - x < 30; generateX += 2) {
 		for (int y = 1; y < 11; y += 2) {
@@ -2124,6 +2180,9 @@ void Assignment2::Generate1_1() {
 	World.push_back(new Blocks(BRICK, Vector3(generateX + 8, 15, 0), 2, 2, 2));
 	World.push_back(new QuestionBlock(GOLDCOIN, Vector3(generateX + 10, 15, 0), 2, 2, 2));
 
+	World.push_back(new Goomba(Vector3(generateX + 16, 1, 0)));
+	World.push_back(new Goomba(Vector3(generateX + 20, 1, 0)));
+
 	World.push_back(new QuestionBlock(GOLDCOIN, Vector3(generateX + 10, 7, 0), 2, 2, 2));
 	World.push_back(new Blocks(BRICK, Vector3(generateX + 22, 7, 0), 2, 2, 2));
 	World.push_back(new QuestionBlock(SUPERSTAR, Vector3(generateX + 24, 7, 0), 2, 2, 2));
@@ -2133,6 +2192,9 @@ void Assignment2::Generate1_1() {
 	World.push_back(new QuestionBlock(GOLDCOIN, Vector3(generateX + 40, 7, 0), 2, 2, 2));
 	World.push_back(new QuestionBlock(GOLDCOIN, Vector3(generateX + 46, 7, 0), 2, 2, 2));
 
+	World.push_back(new Goomba(Vector3(generateX + 50, 1, 0)));
+	World.push_back(new Goomba(Vector3(generateX + 54, 1, 0)));
+
 	// help
 
 	World.push_back(new Blocks(BRICK, Vector3(generateX + 52, 7, 0), 2, 2, 2));
@@ -2140,6 +2202,12 @@ void Assignment2::Generate1_1() {
 	World.push_back(new Blocks(BRICK, Vector3(generateX + 58, 15, 0), 2, 2, 2));
 	World.push_back(new Blocks(BRICK, Vector3(generateX + 60, 15, 0), 2, 2, 2));
 	World.push_back(new Blocks(BRICK, Vector3(generateX + 62, 15, 0), 2, 2, 2));
+
+	World.push_back(new Goomba(Vector3(generateX + 63, 1, 0)));
+	World.push_back(new Goomba(Vector3(generateX + 67, 1, 0)));
+
+	World.push_back(new Goomba(Vector3(generateX + 73, 1, 0)));
+	World.push_back(new Goomba(Vector3(generateX + 77, 1, 0)));
 
 	World.push_back(new Blocks(BRICK, Vector3(generateX + 70, 15, 0), 2, 2, 2));
 	World.push_back(new QuestionBlock(GOLDCOIN, Vector3(generateX + 72, 15, 0), 2, 2, 2));
@@ -2217,11 +2285,15 @@ void Assignment2::Generate1_1() {
 
 	generateX += 8;
 
-	World.push_back(new Blocks(PIPE, Vector3(generateX + 17, -1, 0), 3.5, 9.5, 3.5));
+	World.push_back(new Blocks(PIPE, Vector3(generateX + 17, -1, 0), 3.5, 9.5, 3.5, EXIT));
 	World.push_back(new Blocks(BRICK, Vector3(generateX + 26, 7, 0), 2, 2, 2));
 	World.push_back(new Blocks(BRICK, Vector3(generateX + 28, 7, 0), 2, 2, 2));
 	World.push_back(new QuestionBlock(GOLDCOIN, Vector3(generateX + 30, 7, 0), 2, 2, 2));
 	World.push_back(new Blocks(BRICK, Vector3(generateX + 32, 7, 0), 2, 2, 2));
+
+	World.push_back(new Goomba(Vector3(generateX + 38, 1, 0)));
+	World.push_back(new Goomba(Vector3(generateX + 42, 1, 0)));
+
 	World.push_back(new Blocks(PIPE, Vector3(generateX + 49, -1, 0), 3.5, 9.5, 3.5));
 
 	// last staircase

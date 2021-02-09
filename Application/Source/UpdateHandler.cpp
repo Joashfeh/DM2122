@@ -12,7 +12,6 @@ bool shootFireball = false;
 
 void UpdateHandler(float& bodyAngle, bool& jump, double dt) {
 
-
 	if (Application::IsMousePressed(0) && !Assignment2::player.shoot) {
 		Assignment2::player.shoot = true;
 		shootFireball = false;
@@ -24,7 +23,7 @@ void UpdateHandler(float& bodyAngle, bool& jump, double dt) {
 
 	if (shootTimer < 0) {
 		Assignment2::player.shoot = false;
-		shootTimer = 1.f;
+		shootTimer = .5f;
 	}
 		
 	 
@@ -35,12 +34,23 @@ void UpdateHandler(float& bodyAngle, bool& jump, double dt) {
 
 	Assignment2::player.position += Assignment2::player.velocity;
 
-	MovementHandler(bodyAngle, dt);
 	JumpHandler(jump, dt);
+	MovementHandler(bodyAngle, dt);
 
 	Assignment2::player.grounded = false;
 	if (Assignment2::player.position.y < -20)
 		Assignment2::player.dead = true;		
+
+	if (Assignment2::player.kill) {
+		Assignment2::player.grounded = false;
+		jump = true;
+		stoppedJumping = false;
+
+		if (jumpTimeCounter > 0) {
+			Assignment2::player.velocity.y += 9.81 * dt * 1.f;
+			jumpTimeCounter -= dt;
+		}
+	}
 }
 
 // Movement
@@ -63,12 +73,18 @@ void MovementHandler(float& bodyAngle, double dt) {
 
 	if (Application::IsKeyPressed('A')) {
 		bodyAngle = 270;
-		Assignment2::player.velocityGoal = -0.275;
+		Assignment2::player.velocityGoal = -0.19;
+		if (Application::IsKeyPressed(VK_LSHIFT)) {
+			Assignment2::player.velocityGoal = -0.29;
+		}
 	}
 
 	if (Application::IsKeyPressed('D')) {
 		bodyAngle = 90;
-		Assignment2::player.velocityGoal = 0.275;
+		Assignment2::player.velocityGoal = 0.19;
+		if (Application::IsKeyPressed(VK_LSHIFT)) {
+			Assignment2::player.velocityGoal = 0.29;
+		}
 	}
 }
 
@@ -88,16 +104,6 @@ void JumpHandler(bool& jump, double dt) {
 			stoppedJumping = false;
 			jump = true;
 
-		}
-	}
-
-	if (Assignment2::player.kill) {
-		jump = true;
-		stoppedJumping = false;
-
-		if (jumpTimeCounter > 0) {
-			Assignment2::player.velocity.y += 9.81 * dt * 1.f;
-			jumpTimeCounter -= dt;
 		}
 	}
 

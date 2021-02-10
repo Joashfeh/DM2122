@@ -65,7 +65,7 @@ void Assignment2::Init()
 		translateZ = 0;
 
 		flagHeight = 0;
-
+		gameWin = false;
 		toggleLight = true;
 	}
 
@@ -186,7 +186,7 @@ void Assignment2::Init()
 	meshList[GEO_FLOOR] = MeshBuilder::GenerateQuad("Floor", Color(1, 1, 1), 1.f);
 
 	meshList[GEO_TEXT] = MeshBuilder::GenerateText("text", 16, 16);
-	meshList[GEO_TEXT]->textureID = LoadTGA("Image//Arial.tga");
+	meshList[GEO_TEXT]->textureID = LoadTGA("Image//MarioUI.tga");
 
 	meshList[GEO_GOOMBA] = MeshBuilder::GenerateOBJMTL("goomba", "OBJ//goomba.obj", "OBJ//goomba.mtl");
 	meshList[GEO_GOOMBA]->textureID = LoadTGA("Image//goomba.tga");
@@ -309,6 +309,8 @@ void Assignment2::Update(double dt) {
 				player.position.y -= dt * 9;
 
 			}
+			else
+				gameWin = true;
 		}
 
 		// OH MY GOD WHY
@@ -348,6 +350,7 @@ void Assignment2::Update(double dt) {
 					if (World[k] != nullptr) {
 						if (((Fireball*)World[i])->AABB(*World[i], *World[k]) && World[k]->type != FIREBALL) {
 							if (World[k]->type == GOOMBA) {
+								player.Score += 200;
 								delete World[k];
 								World[k] = nullptr;
 							}
@@ -501,9 +504,29 @@ void Assignment2::Render() {
 
 	std::stringstream ss;
 	ss.precision(6);
-	ss << "SCORE: " << std::setw(6) << std::setfill('0') << player.Score;
-	RenderTextOnScreen(meshList[GEO_TEXT], ss.str(), Color(0, 0, 0), 4, 2, 55);
+	ss << "score: " << std::setw(6) << std::setfill('0') << player.Score;
+	RenderTextOnScreen(meshList[GEO_TEXT], ss.str(), Color(0, 0, 0), 3, 2, 55);
 
+	RenderTextOnScreen(meshList[GEO_TEXT], "world 1-1", Color(0, 0, 0), 3, 60, 55);
+	RenderTextOnScreen(meshList[GEO_TEXT], "wasd - move", Color(1, 1, 1), 3, 1, 0);
+	RenderTextOnScreen(meshList[GEO_TEXT], "space - jump", Color(0.8, 0.8, 0.8), 3, 1, 3);
+	RenderTextOnScreen(meshList[GEO_TEXT], "lshift - sprint", Color(1, 1, 1), 3, 1, 6);
+	RenderTextOnScreen(meshList[GEO_TEXT], "lmb - fireball", Color(0.8, 0.8, 0.8), 3, 1, 9);
+
+	std::stringstream ss2;
+	ss2 << "superstar: " << std::boolalpha << player.superStar;
+	RenderTextOnScreen(meshList[GEO_TEXT], ss2.str(), Color(0.941, 0.902, 0.549), 3, 37, 9);
+
+	std::stringstream ss3;
+	ss3 << "fireflower: " << std::boolalpha << player.flower;
+	RenderTextOnScreen(meshList[GEO_TEXT], ss3.str(), Color(1.000, 0.388, 0.278), 3, 37, 6);
+
+	std::stringstream ss4;
+	ss4 << "mushroom: " << std::boolalpha << player.scaled;
+	RenderTextOnScreen(meshList[GEO_TEXT], ss4.str(), Color(0.863, 0.078, 0.235), 3, 37, 3);
+
+	if (gameWin)
+		RenderTextOnScreen(meshList[GEO_TEXT], "you win!", Color(1, 1, 1), 13, 8, 25);
 
 	Position lightPosition_cameraspace = viewStack.Top() * light[0].position;
 	glUniform3fv(m_parameters[U_LIGHT0_POSITION], 1, &lightPosition_cameraspace.x);
@@ -566,7 +589,7 @@ void Assignment2::RenderMesh(Mesh* mesh, bool enableLight)
 
 void Assignment2::RenderTextOnScreen(Mesh* mesh, std::string text, Color color, float size, float x, float y)
 {
-	LoadTextData(textWidthData, "TextData//ArialFontData.csv");
+	LoadTextData(textWidthData, "TextData//MarioUI.csv");
 	if (!mesh || mesh->textureID <= 0) //Proper error check
 		return;
 	glDisable(GL_DEPTH_TEST);
@@ -1924,8 +1947,6 @@ void Assignment2::RenderBlocks() {
 				// modelStack.Scale(1.1, 1.1, 1.1);
 
 				switch (((Blocks*)World[i])->blockType) {
-				case BARRIER:
-					break;
 				case BRICK:
 					RenderMesh(meshList[GEO_BRICK], toggleLight);
 					break;
@@ -2116,6 +2137,7 @@ void Assignment2::ResetGame()
 	flagHeight = 0;
 	frames = 0;
 	pipeTime = 0;
+	gameWin = false;
 }
 
 // this code sucks

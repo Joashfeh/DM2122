@@ -121,6 +121,7 @@ private:
 
 	float flagHeight;
 
+	bool gameWin;
 	bool running;
 	bool jump;
 

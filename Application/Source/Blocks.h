@@ -2,7 +2,6 @@
 #include "Entities.h"
 
 enum BLOCK_TYPE {
-	BARRIER, 
 	UNBREAKABLE,
 	BRICK,
 	PIPE,

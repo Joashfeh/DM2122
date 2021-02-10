@@ -143,7 +143,6 @@ void Application::Init()
 	m_height = 600;
 	m_window = glfwCreateWindow(m_width, m_height, "Test Window", NULL, NULL);
 	glfwSetWindowSizeCallback(m_window, resize_callback);
-	glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 	//If the window couldn't be created
 	if (!m_window)
@@ -187,9 +186,12 @@ void Application::Run()
 
 		switch (sceneType) {
 		case UI:
+			glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 			scene = scene1;
 			break;
 		case GAME:
+			glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+			GetMouseUpdate();
 			scene = scene2;
 			break;
 		}
@@ -199,7 +201,6 @@ void Application::Run()
 		else if (IsKeyPressed(VK_F2))
 			sceneType = GAME;
 
-		GetMouseUpdate();
 		scene->Update(m_timer.getElapsedTime());
 		scene->Render();
 		//Swap buffers

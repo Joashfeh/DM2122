@@ -56,12 +56,14 @@ bool Mario::Collision(Entities& entity) {
     if (AABB(*this, entity)) {
 
         if (((Blocks*)&entity)->blockType == STAR) {
+            Score += 1000;
             superStar = true;
             delete& entity;
             return true;
         }
 
         if (((Blocks*)&entity)->blockType == FLOWER) {
+            Score += 1000;
             flower = true;
             delete& entity;
             return true;
@@ -75,12 +77,13 @@ bool Mario::Collision(Entities& entity) {
         }
 
         if (((Blocks*)&entity)->blockType == COIN) {
-            Score += 100;
+            Score += 200;
             delete& entity;
             return true;
         }
 
         if (((Blocks*)&entity)->blockType == POLE) {
+            Score += floor(position.y * 1000);
             canMove = false;
             Win = true;
             return false;

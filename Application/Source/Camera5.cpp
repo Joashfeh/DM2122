@@ -184,22 +184,6 @@ void Camera5::Update(double dt)
 		Reset();
 		type = FIRSTPERSON;
 	}
-
-	if(Application::IsKeyPressed('N'))
-	{
-		Vector3 view = target - position;
-		if(view.Length() > 1) //Prevent the camera from touching the origin
-		{
-			view.Normalize();
-			position += view * ZOOM_SPEED * dt;
-		}
-	}
-
-	if(Application::IsKeyPressed('M'))
-	{
-		Vector3 view = (target - position).Normalized();
-		position -= view * ZOOM_SPEED * dt;
-	}
 	if(Application::IsKeyPressed('R'))
 	{
 		Reset();
